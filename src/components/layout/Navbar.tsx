@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const links = [
   { href: "/rooms", label: "Hotel Rooms" },
@@ -118,6 +119,7 @@ export default function Navbar() {
         {/* Actions */}
         <div className="hidden md:flex items-center gap-4">
           <div className="flex items-center gap-2 text-muted-foreground">
+            <ThemeToggle />
             <Button variant="ghost" size="icon" title="Language">
               <Globe className="h-4 w-4" />
             </Button>
@@ -146,6 +148,7 @@ export default function Navbar() {
 
         {/* Mobile Menu Toggle */}
         <div className="flex items-center gap-2 md:hidden">
+          <ThemeToggle />
           {user && <UserMenu />}
           <button
             className="flex items-center p-2"

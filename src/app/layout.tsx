@@ -18,8 +18,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import AuthProvider from "@/providers/AuthProvider";
 
-// ... imports
-
+import ThemeProvider from "@/providers/ThemeProvider";
 import { Toaster } from "sonner";
 
 export default function RootLayout({
@@ -35,16 +34,23 @@ export default function RootLayout({
           outfit.variable
         )}
       >
-        <QueryProvider>
-          <Toaster position="top-right" richColors />
-          <AuthProvider>
-            <Navbar />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
-          </AuthProvider>
-        </QueryProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <QueryProvider>
+            <Toaster position="top-right" richColors />
+            <AuthProvider>
+              <Navbar />
+              <main className="flex-1">
+                {children}
+              </main>
+              <Footer />
+            </AuthProvider>
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
