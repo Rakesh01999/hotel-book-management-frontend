@@ -1,9 +1,15 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Mail, Phone, MapPin, Globe, History, Target, Users } from "lucide-react";
 import Image from "next/image";
+import { useTranslation } from "@/hooks/useTranslation";
+import Link from "next/link";
 
 export default function AboutPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -16,9 +22,9 @@ export default function AboutPage() {
           priority
         />
         <div className="relative z-10 text-center text-white px-4">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">About LuxeStay</h1>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">{t("about.title")}</h1>
           <p className="text-lg md:text-xl max-w-2xl mx-auto font-light">
-            Redefining luxury hospitality with passion, elegance, and unparalleled service.
+            {t("about.subtitle")}
           </p>
         </div>
       </section>
@@ -30,14 +36,14 @@ export default function AboutPage() {
             <div className="space-y-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
                 <History className="h-4 w-4" />
-                <span>Our Journey</span>
+                <span>{t("about.badge")}</span>
               </div>
-              <h2 className="text-3xl font-bold">A Legacy of Excellence</h2>
+              <h2 className="text-3xl font-bold">{t("about.legacyTitle")}</h2>
               <p className="text-muted-foreground leading-relaxed">
-                Founded in 2010, LuxeStay began with a simple vision: to create a sanctuary where luxury meets comfort. What started as a single boutique hotel has grown into a prestigious collection of properties known for their distinctive character and exceptional standards.
+                {t("about.legacyText1")}
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                Over the decade, we have hosted thousands of guests, each contributing to our rich history of hospitality. Our commitment to innovation and tradition ensures that every stay is more than just a visit—it's an experience to remember.
+                {t("about.legacyText2")}
               </p>
             </div>
             <div className="relative h-[350px] rounded-2xl overflow-hidden shadow-2xl">
@@ -61,9 +67,9 @@ export default function AboutPage() {
                 <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary">
                   <Target className="h-6 w-6" />
                 </div>
-                <h3 className="text-xl font-bold">Our Mission</h3>
+                <h3 className="text-xl font-bold">{t("about.mission.title")}</h3>
                 <p className="text-muted-foreground text-sm">
-                  To provide an unforgettable luxury experience through meticulous attention to detail and personalized service that exceeds guest expectations.
+                   {t("about.mission.desc")}
                 </p>
               </CardContent>
             </Card>
@@ -73,9 +79,9 @@ export default function AboutPage() {
                 <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary">
                   <Globe className="h-6 w-6" />
                 </div>
-                <h3 className="text-xl font-bold">Our Vision</h3>
+                <h3 className="text-xl font-bold">{t("about.vision.title")}</h3>
                 <p className="text-muted-foreground text-sm">
-                  To be the global benchmark for luxury hospitality, setting standards for sustainability, innovation, and timeless elegance across the world.
+                  {t("about.vision.desc")}
                 </p>
               </CardContent>
             </Card>
@@ -85,9 +91,9 @@ export default function AboutPage() {
                 <div className="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary">
                   <Users className="h-6 w-6" />
                 </div>
-                <h3 className="text-xl font-bold">Our Values</h3>
+                <h3 className="text-xl font-bold">{t("about.values.title")}</h3>
                 <p className="text-muted-foreground text-sm">
-                  Integrity, respect, and a passion for excellence guide everything we do, ensuring a culture of hospitality that feels like home.
+                  {t("about.values.desc")}
                 </p>
               </CardContent>
             </Card>
@@ -98,17 +104,21 @@ export default function AboutPage() {
       {/* Team CTA */}
       <section className="py-20 bg-background text-center">
         <div className="container px-4 space-y-8">
-          <h2 className="text-3xl md:text-4xl font-bold">Ready to Experience Luxury?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">{t("about.cta.title")}</h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Book your stay today and discover why LuxeStay is the preferred choice for discerning travelers worldwide.
+            {t("about.cta.desc")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="px-8 shadow-lg shadow-primary/20">
-              Browse Rooms
-            </Button>
-            <Button size="lg" variant="outline" className="px-8">
-              Contact Sales
-            </Button>
+            <Link href="/rooms">
+              <Button size="lg" className="px-8 shadow-lg shadow-primary/20 w-full sm:w-auto">
+                {t("about.cta.browse")}
+              </Button>
+            </Link>
+            <Link href="/contact">
+              <Button size="lg" variant="outline" className="px-8 w-full sm:w-auto">
+                {t("about.cta.contact")}
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

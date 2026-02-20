@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Menu, X, Globe, DollarSign, User as UserIcon, LogOut, Settings, LayoutDashboard } from "lucide-react";
+import { Menu, X, DollarSign, LogOut, Settings, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/useAuthStore";
 import { cn } from "@/lib/utils";
@@ -17,23 +17,28 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "@/components/ThemeToggle";
-
-const links = [
-  { href: "/rooms", label: "Hotel Rooms" },
-  { href: "/policy", label: "Policies" },
-  { href: "/amenities", label: "Amenities" },
-  { href: "/gallery", label: "Gallery" },
-];
+import { LanguageSelector } from "@/components/LanguageSelector";
+import { useTranslation } from "@/hooks/useTranslation";
 
 import { toast } from "sonner";
 import api from "@/lib/axios";
 import { useRouter } from "next/navigation";
 
-export default function Navbar() {
+const Navbar = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const { user, logout, isAuthenticated } = useAuthStore();
   const router = useRouter();
+
+  const links = [
+    { href: "/rooms", label: t("nav.rooms") },
+    { href: "/policy", label: t("nav.policies") },
+    { href: "/amenities", label: t("nav.amenities") },
+    { href: "/gallery", label: t("nav.gallery") },
+    { href: "/about", label: t("nav.about") },
+    { href: "/contact", label: t("nav.contact") },
+  ];
 
   console.log("Navbar - State:", { user: !!user, isAuthenticated });
 
@@ -120,9 +125,7 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-4">
           <div className="flex items-center gap-2 text-muted-foreground">
             <ThemeToggle />
-            <Button variant="ghost" size="icon" title="Language">
-              <Globe className="h-4 w-4" />
-            </Button>
+            <LanguageSelector />
             <Button variant="ghost" size="icon" title="Currency">
               <DollarSign className="h-4 w-4" />
             </Button>
@@ -134,12 +137,12 @@ export default function Navbar() {
             <div className="flex items-center gap-2">
               <Link href="/login" passHref legacyBehavior>
                 <Button variant="ghost" size="sm" asChild>
-                  <a>Login</a>
+                  <a>{t("nav.login")}</a>
                 </Button>
               </Link>
               <Link href="/register" passHref legacyBehavior>
                 <Button size="sm" asChild>
-                  <a>Register</a>
+                  <a>{t("nav.register")}</a>
                 </Button>
               </Link>
             </div>
@@ -149,6 +152,7 @@ export default function Navbar() {
         {/* Mobile Menu Toggle */}
         <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
+          <LanguageSelector />
           {user && <UserMenu />}
           <button
             className="flex items-center p-2"
@@ -211,4 +215,6 @@ export default function Navbar() {
       )}
     </header>
   );
-}
+};
+
+export default Navbar;

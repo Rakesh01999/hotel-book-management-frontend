@@ -1,3 +1,6 @@
+"use client";
+
+import * as React from "react";
 import Link from "next/link";
 import { ArrowRight, MapPin, Coffee, HelpCircle, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,8 +21,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useTranslation } from "@/hooks/useTranslation";
+import { useRoomStore } from "@/store/useRoomStore";
+import Image from "next/image";
 
 export default function Home() {
+  const { t } = useTranslation();
+  const { rooms, isLoading, fetchRooms } = useRoomStore();
+
+  React.useEffect(() => {
+    fetchRooms();
+  }, [fetchRooms]);
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -32,10 +45,10 @@ export default function Home() {
         
         <div className="relative z-10 container text-center space-y-6">
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight animate-fade-in-up">
-            Experience Luxury <br /> Like Never Before
+            {t("hero.title")}
           </h1>
           <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto">
-            Discover comfort, elegance, and personalized service at LuxeStay. Your perfect getaway awaits.
+            {t("hero.description")}
           </p>
           
           <Card className="max-w-4xl mx-auto mt-8 bg-white/10 backdrop-blur-md border-white/20 text-left">
@@ -64,7 +77,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-end">
                   <Button size="lg" className="w-full bg-white text-black hover:bg-gray-200">
-                    Check Availability
+                    {t("hero.cta")}
                   </Button>
                 </div>
               </div>
@@ -105,7 +118,7 @@ export default function Home() {
       <section className="py-20 bg-muted/20">
         <div className="container">
           <div className="flex justify-between items-center mb-10">
-            <h2 className="text-3xl font-bold">Our Rooms</h2>
+            <h2 className="text-3xl font-bold">{t("rooms.title")}</h2>
             <Link href="/rooms">
               <Button variant="ghost" className="gap-2 group">
                 View All <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -113,26 +126,45 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-             {/* Placeholders for Room Cards */}
-             {[1, 2, 3].map((i) => (
-               <Card key={i} className="overflow-hidden hover:shadow-xl transition-all border-none shadow-md">
-                 <div className="h-64 bg-gray-200 relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-slate-300 animate-pulse flex items-center justify-center text-slate-400 group-hover:scale-105 transition-transform duration-500">
-                      Room Image {i}
-                    </div>
-                 </div>
-                 <CardHeader>
-                   <CardTitle>Deluxe Suite {i}</CardTitle>
-                   <CardDescription>Ocean view, King bed, 50m²</CardDescription>
-                 </CardHeader>
-                 <CardContent>
-                   <div className="flex justify-between items-center">
-                     <span className="text-lg font-bold text-primary">$250 <span className="text-sm font-normal text-muted-foreground">/ night</span></span>
-                     <Button size="sm">Book Now</Button>
+             {isLoading ? (
+               [1, 2, 3].map((i) => (
+                 <Card key={i} className="overflow-hidden animate-pulse">
+                   <div className="h-64 bg-slate-200" />
+                   <CardHeader className="space-y-2">
+                     <div className="h-6 bg-slate-200 w-3/4 rounded" />
+                     <div className="h-4 bg-slate-200 w-1/2 rounded" />
+                   </CardHeader>
+                   <CardContent>
+                     <div className="h-10 bg-slate-200 rounded" />
+                   </CardContent>
+                 </Card>
+               ))
+             ) : (
+               rooms.slice(0, 3).map((room) => (
+                 <Card key={room.id} className="overflow-hidden hover:shadow-xl transition-all border-none shadow-md bg-background">
+                   <div className="h-64 relative overflow-hidden group">
+                      <Image 
+                        src={room.roomType.images?.[0] || "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop"} 
+                        alt={room.roomType.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
                    </div>
-                 </CardContent>
-               </Card>
-             ))}
+                   <CardHeader>
+                     <CardTitle>{room.roomType.name} (Room {room.roomNumber})</CardTitle>
+                     <CardDescription className="line-clamp-2">{room.roomType.description}</CardDescription>
+                   </CardHeader>
+                   <CardContent>
+                     <div className="flex justify-between items-center">
+                       <span className="text-lg font-bold text-primary">
+                         ${room.roomType.price} <span className="text-sm font-normal text-muted-foreground">{t("rooms.perNight")}</span>
+                       </span>
+                       <Button size="sm">{t("rooms.viewDetail")}</Button>
+                     </div>
+                   </CardContent>
+                 </Card>
+               ))
+             )}
           </div>
         </div>
       </section>
