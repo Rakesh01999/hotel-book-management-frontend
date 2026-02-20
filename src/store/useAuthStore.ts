@@ -8,6 +8,7 @@ interface User {
     role: string;
     verified: boolean;
     status: string;
+    profilePhoto?: string | null;
     createdAt: string;
 }
 

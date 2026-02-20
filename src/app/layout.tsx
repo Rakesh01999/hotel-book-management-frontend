@@ -16,6 +16,7 @@ export const metadata: Metadata = {
 
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import AuthProvider from "@/providers/AuthProvider";
 
 // ... imports
 
@@ -36,11 +37,13 @@ export default function RootLayout({
       >
         <QueryProvider>
           <Toaster position="top-right" richColors />
-          <Navbar />
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
+          <AuthProvider>
+            <Navbar />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </AuthProvider>
         </QueryProvider>
       </body>
     </html>

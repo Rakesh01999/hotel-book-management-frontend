@@ -3,10 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Menu, X, Globe, DollarSign } from "lucide-react";
+import { Menu, X, Globe, DollarSign, User as UserIcon, LogOut, Settings, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/useAuthStore";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const links = [
   { href: "/rooms", label: "Hotel Rooms" },
@@ -22,8 +31,10 @@ import { useRouter } from "next/navigation";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  const { user, logout } = useAuthStore();
+  const { user, logout, isAuthenticated } = useAuthStore();
   const router = useRouter();
+
+  console.log("Navbar - State:", { user: !!user, isAuthenticated });
 
   const handleLogout = async () => {
     try {
@@ -34,8 +45,49 @@ export default function Navbar() {
     } catch (error) {
       console.error("Logout error:", error);
       logout(); // still clear local state
-      toast.error("Error logging out, but local session cleared.");
+      toast.error("Logged out.");
     }
+  };
+
+  const UserMenu = () => {
+    if (!user) return null;
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={user.profilePhoto || ""} alt={user.name} />
+              <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56" align="end" forceMount>
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">{user.name}</p>
+              <p className="text-xs leading-none text-muted-foreground">
+                {user.email}
+              </p>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => router.push("/dashboard")}>
+            <LayoutDashboard className="mr-2 h-4 w-4" />
+            <span>Dashboard</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push("/profile")}>
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Profile Settings</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive">
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
   };
 
   return (
@@ -75,29 +127,33 @@ export default function Navbar() {
           </div>
           
           {user ? (
-             <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">{user.name}</span>
-                <Button variant="destructive" size="sm" onClick={handleLogout}>Logout</Button>
-             </div>
+             <UserMenu />
           ) : (
             <div className="flex items-center gap-2">
-              <Link href="/login">
-                <Button variant="ghost" size="sm">Login</Button>
+              <Link href="/login" passHref legacyBehavior>
+                <Button variant="ghost" size="sm" asChild>
+                  <a>Login</a>
+                </Button>
               </Link>
-              <Link href="/register">
-                <Button size="sm">Register</Button>
+              <Link href="/register" passHref legacyBehavior>
+                <Button size="sm" asChild>
+                  <a>Register</a>
+                </Button>
               </Link>
             </div>
           )}
         </div>
 
         {/* Mobile Menu Toggle */}
-        <button
-          className="flex items-center p-2 md:hidden"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          {user && <UserMenu />}
+          <button
+            className="flex items-center p-2"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
@@ -108,23 +164,44 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium hover:text-primary"
+                className="text-base font-medium hover:text-primary py-2 border-b border-muted last:border-0"
                 onClick={() => setIsOpen(false)}
               >
                 {link.label}
               </Link>
             ))}
           </nav>
-          <div className="border-t pt-4 flex flex-col gap-2">
-             {!user && (
+          <div className="pt-4 flex flex-col gap-2">
+             {!user ? (
                 <>
-                  <Link href="/login" onClick={() => setIsOpen(false)}>
-                    <Button variant="ghost" className="w-full justify-start">Login</Button>
+                  <Link href="/login" passHref legacyBehavior onClick={() => setIsOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start" asChild>
+                      <a>Login</a>
+                    </Button>
                   </Link>
-                  <Link href="/register" onClick={() => setIsOpen(false)}>
-                    <Button className="w-full justify-start">Register</Button>
+                  <Link href="/register" passHref legacyBehavior onClick={() => setIsOpen(false)}>
+                    <Button className="w-full justify-start" asChild>
+                      <a>Register</a>
+                    </Button>
                   </Link>
                 </>
+             ) : (
+               <div className="space-y-2">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src={user.profilePhoto || ""} alt={user.name} />
+                      <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col">
+                      <p className="text-sm font-semibold">{user.name}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                    </div>
+                  </div>
+                  <Button variant="ghost" className="w-full justify-start text-destructive" onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </Button>
+               </div>
              )}
           </div>
         </div>
