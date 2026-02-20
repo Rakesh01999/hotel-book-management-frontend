@@ -19,6 +19,8 @@ import Footer from "@/components/layout/Footer";
 
 // ... imports
 
+import { Toaster } from "sonner";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,6 +35,7 @@ export default function RootLayout({
         )}
       >
         <QueryProvider>
+          <Toaster position="top-right" richColors />
           <Navbar />
           <main className="flex-1">
             {children}

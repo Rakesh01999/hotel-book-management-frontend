@@ -11,6 +11,9 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { toast } from "sonner";
+import api from "@/lib/axios";
+
 const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
@@ -35,24 +38,25 @@ export default function RegisterPage() {
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
   });
-  const { login } = useAuthStore();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (data: RegisterForm) => {
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      login({
-        id: "2",
-        name: data.name,
-        email: data.email,
-        role: "user",
-        accessToken: "demo-token",
-      });
+    try {
+      // Backend expects { name, email, password }
+      const { confirmPassword, ...registerData } = data;
+      await api.post("/auth/register", registerData);
+      
+      toast.success("Registration successful! Please check your email to verify your account.");
+      router.push("/login");
+    } catch (error: any) {
+      console.error("Registration error:", error);
+      const message = error.response?.data?.message || "Registration failed. Please try again.";
+      toast.error(message);
+    } finally {
       setIsLoading(false);
-      router.push("/");
-    }, 1000);
+    }
   };
 
   return (

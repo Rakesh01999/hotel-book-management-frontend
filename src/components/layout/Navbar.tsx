@@ -15,10 +15,28 @@ const links = [
   { href: "/gallery", label: "Gallery" },
 ];
 
+import { toast } from "sonner";
+import api from "@/lib/axios";
+import { useRouter } from "next/navigation";
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const { user, logout } = useAuthStore();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await api.post("/auth/logout");
+      logout();
+      toast.success("Logged out successfully");
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      logout(); // still clear local state
+      toast.error("Error logging out, but local session cleared.");
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -59,7 +77,7 @@ export default function Navbar() {
           {user ? (
              <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">{user.name}</span>
-                <Button variant="destructive" size="sm" onClick={logout}>Logout</Button>
+                <Button variant="destructive" size="sm" onClick={handleLogout}>Logout</Button>
              </div>
           ) : (
             <div className="flex items-center gap-2">
