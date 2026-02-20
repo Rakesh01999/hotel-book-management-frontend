@@ -19,7 +19,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const links = [
   { href: "/rooms", label: "Hotel Rooms" },
-  { href: "/policies", label: "Policies" },
+  { href: "/policy", label: "Policies" },
   { href: "/amenities", label: "Amenities" },
   { href: "/gallery", label: "Gallery" },
 ];
