@@ -10,11 +10,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function RoomsPage() {
   const { t } = useTranslation();
-  const { rooms, isLoading, fetchRooms } = useRoomStore();
+  const { roomTypes, isLoading, fetchRoomTypes } = useRoomStore();
 
   React.useEffect(() => {
-    fetchRooms();
-  }, [fetchRooms]);
+    fetchRoomTypes();
+  }, [fetchRoomTypes]);
 
   return (
     <div className="container py-12 space-y-10">
@@ -39,13 +39,13 @@ export default function RoomsPage() {
               </CardContent>
             </Card>
           ))
-        ) : rooms.length > 0 ? (
-          rooms.map((room) => (
-            <Card key={room.id} className="overflow-hidden hover:shadow-xl transition-all border-none shadow-lg bg-card group">
+        ) : roomTypes.length > 0 ? (
+          roomTypes.map((type) => (
+            <Card key={type.id} className="overflow-hidden hover:shadow-xl transition-all border-none shadow-lg bg-card group">
               <div className="h-64 relative overflow-hidden">
                 <Image
-                  src={room.roomType.images?.[0] || "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop"}
-                  alt={room.roomType.name}
+                  src={type.images?.[0] || "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop"}
+                  alt={type.name}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
@@ -53,28 +53,30 @@ export default function RoomsPage() {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-xl">{room.roomType.name}</CardTitle>
-                    <CardDescription>Room {room.roomNumber}</CardDescription>
+                    <CardTitle className="text-xl">{type.name}</CardTitle>
+                    <CardDescription>
+                      {type.rooms?.length || 0} {type.rooms?.length === 1 ? "Room" : "Rooms"} Available
+                    </CardDescription>
                   </div>
                   <div className="text-right">
-                    <span className="text-xl font-bold text-primary">${room.roomType.price}</span>
+                    <span className="text-xl font-bold text-primary">${type.price}</span>
                     <p className="text-xs text-muted-foreground">{t("rooms.perNight")}</p>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-muted-foreground line-clamp-3">
-                  {room.roomType.description}
+                  {type.description}
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {room.roomType.facilities.slice(0, 3).map((facility, idx) => (
+                  {type.facilities.slice(0, 3).map((facility, idx) => (
                     <span key={idx} className="text-xs bg-muted px-2 py-1 rounded-md">
                       {facility}
                     </span>
                   ))}
-                  {room.roomType.facilities.length > 3 && (
+                  {type.facilities.length > 3 && (
                     <span className="text-xs text-muted-foreground">
-                      +{room.roomType.facilities.length - 3} more
+                      +{type.facilities.length - 3} more
                     </span>
                   )}
                 </div>

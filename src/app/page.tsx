@@ -27,11 +27,11 @@ import Image from "next/image";
 
 export default function Home() {
   const { t } = useTranslation();
-  const { rooms, isLoading, fetchRooms } = useRoomStore();
+  const { roomTypes, isLoading, fetchRoomTypes } = useRoomStore();
 
   React.useEffect(() => {
-    fetchRooms();
-  }, [fetchRooms]);
+    fetchRoomTypes();
+  }, [fetchRoomTypes]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -140,26 +140,28 @@ export default function Home() {
                  </Card>
                ))
              ) : (
-               rooms.slice(0, 3).map((room) => (
-                 <Card key={room.id} className="overflow-hidden hover:shadow-xl transition-all border-none shadow-md bg-background">
+               roomTypes.slice(0, 3).map((type) => (
+                 <Card key={type.id} className="overflow-hidden hover:shadow-xl transition-all border-none shadow-md bg-background">
                    <div className="h-64 relative overflow-hidden group">
                       <Image 
-                        src={room.roomType.images?.[0] || "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop"} 
-                        alt={room.roomType.name}
+                        src={type.images?.[0] || "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop"} 
+                        alt={type.name}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                    </div>
                    <CardHeader>
-                     <CardTitle>{room.roomType.name} (Room {room.roomNumber})</CardTitle>
-                     <CardDescription className="line-clamp-2">{room.roomType.description}</CardDescription>
+                     <CardTitle>{type.name}</CardTitle>
+                     <CardDescription className="line-clamp-2">{type.description}</CardDescription>
                    </CardHeader>
                    <CardContent>
                      <div className="flex justify-between items-center">
                        <span className="text-lg font-bold text-primary">
-                         ${room.roomType.price} <span className="text-sm font-normal text-muted-foreground">{t("rooms.perNight")}</span>
+                         ${type.price} <span className="text-sm font-normal text-muted-foreground">{t("rooms.perNight")}</span>
                        </span>
-                       <Button size="sm">{t("rooms.viewDetail")}</Button>
+                       <Link href={`/rooms`}>
+                           <Button size="sm">{t("rooms.viewDetail")}</Button>
+                         </Link>
                      </div>
                    </CardContent>
                  </Card>
