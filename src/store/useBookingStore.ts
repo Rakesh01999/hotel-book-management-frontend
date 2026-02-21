@@ -11,6 +11,7 @@ interface BookingState {
     setDates: (dates: { from: Date | undefined; to: Date | undefined }) => void;
     setGuests: (guests: { adults: number; children: number }) => void;
     fetchUserBookings: (userId: number) => Promise<void>;
+    createBooking: (bookingData: any) => Promise<{ url?: string; success: boolean }>;
     resetBooking: () => void;
 }
 
@@ -26,12 +27,27 @@ export const useBookingStore = create<BookingState>((set) => ({
     fetchUserBookings: async (userId: number) => {
         set({ isLoading: true, error: null });
         try {
-            // Using the endpoint discovered in backend: /api/booking?searchTerm=userId
-            const response = await axios.get(`/booking?searchTerm=${userId}`);
-            // The backend returns { data: { data: Booking[] } } based on my analysis
+            const response = await axios.get(`/book?searchTerm=${userId}`);
             set({ userBookings: response.data.data.data, isLoading: false });
         } catch (error: any) {
             set({ error: error.message || "Failed to fetch bookings", isLoading: false });
+        }
+    },
+
+    createBooking: async (bookingData) => {
+        set({ isLoading: true, error: null });
+        try {
+            // Using the Online booking endpoint (with payment)
+            const response = await axios.post('/book/online-book', bookingData);
+            set({ isLoading: false });
+            return {
+                url: response.data.data.url,
+                success: true
+            };
+        } catch (error: any) {
+            const errorMessage = error.response?.data?.message || error.message || "Booking failed";
+            set({ error: errorMessage, isLoading: false });
+            return { success: false };
         }
     },
 
