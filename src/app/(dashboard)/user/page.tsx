@@ -191,17 +191,21 @@ export default function UserDashboardPage() {
                     <CardTitle className="text-lg">Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent className="p-2 pt-0 space-y-1">
-                    <Button variant="ghost" className="w-full justify-start gap-3 h-12 rounded-none px-4">
-                        <User className="h-4 w-4 text-primary" />
-                        Edit Profile
-                    </Button>
+                    <Link href="/user/profile">
+                        <Button variant="ghost" className="w-full justify-start gap-3 h-12 rounded-none px-4">
+                            <User className="h-4 w-4 text-primary" />
+                            View Profile
+                        </Button>
+                    </Link>
+                    <Link href="/user/settings">
+                        <Button variant="ghost" className="w-full justify-start gap-3 h-12 rounded-none px-4">
+                            <Settings className="h-4 w-4 text-primary" />
+                            Account Settings
+                        </Button>
+                    </Link>
                     <Button variant="ghost" className="w-full justify-start gap-3 h-12 rounded-none px-4">
                         <CreditCard className="h-4 w-4 text-primary" />
                         Payment Methods
-                    </Button>
-                    <Button variant="ghost" className="w-full justify-start gap-3 h-12 rounded-none px-4">
-                        <Settings className="h-4 w-4 text-primary" />
-                        Account Settings
                     </Button>
                 </CardContent>
             </Card>

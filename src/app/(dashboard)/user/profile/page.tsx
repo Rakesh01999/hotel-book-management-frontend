@@ -23,39 +23,13 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import api from "@/lib/axios";
 import { format } from "date-fns";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 export default function ProfilePage() {
-  const { user, updateUser } = useAuthStore();
-  const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { user } = useAuthStore();
   
-  // Form State
-  const [formData, setFormData] = useState({
-    name: user?.name || "",
-    contactNumber: user?.contactNumber || "",
-  });
-
   if (!user) return null;
-
-  const handleUpdate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      // In a real app, you'd send this to your backend
-      // const response = await api.patch("/user/profile", formData);
-      // For now, we'll simulate the update
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      updateUser(formData);
-      toast.success("Profile updated successfully!");
-      setIsEditing(false);
-    } catch (error) {
-      toast.error("Failed to update profile. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -93,23 +67,12 @@ export default function ProfilePage() {
           </div>
         </div>
         <div className="flex gap-3">
-          {!isEditing ? (
-            <Button onClick={() => setIsEditing(true)} className="gap-2">
+          <Link href="/user/settings">
+            <Button className="gap-2 shadow-lg shadow-primary/20">
               <Settings className="h-4 w-4" />
-              Edit Profile
+              Account Settings
             </Button>
-          ) : (
-            <>
-              <Button variant="ghost" onClick={() => setIsEditing(false)} className="gap-2">
-                <X className="h-4 w-4" />
-                Cancel
-              </Button>
-              <Button onClick={handleUpdate} isLoading={loading} className="gap-2">
-                <Save className="h-4 w-4" />
-                Save Changes
-              </Button>
-            </>
-          )}
+          </Link>
         </div>
       </div>
 
@@ -117,68 +80,68 @@ export default function ProfilePage() {
         {/* Personal Details Card */}
         <Card className="lg:col-span-2 border-none shadow-sm">
           <CardHeader>
-            <CardTitle>Personal Information</CardTitle>
-            <CardDescription>Update your personal details and contact information.</CardDescription>
+            <CardTitle>Detailed Profile Information</CardTitle>
+            <CardDescription>Comprehensive overview of your personal and account details.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <form onSubmit={handleUpdate} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      id="name" 
-                      value={formData.name} 
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      disabled={!isEditing}
-                      className="pl-10 h-10 bg-muted/30 focus-visible:bg-background transition-colors"
-                      placeholder="Enter your full name"
-                    />
-                  </div>
+          <CardContent className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Full Name</Label>
+                  <p className="text-lg font-semibold flex items-center gap-2">
+                    <User className="h-4 w-4 text-primary" />
+                    {user.name}
+                  </p>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      id="email" 
-                      value={user.email} 
-                      disabled 
-                      className="pl-10 h-10 bg-muted/10 opacity-70"
-                    />
-                  </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Email Address</Label>
+                  <p className="text-lg font-semibold flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-primary" />
+                    {user.email}
+                  </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Contact Number</Label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      id="phone" 
-                      value={formData.contactNumber} 
-                      onChange={(e) => setFormData({...formData, contactNumber: e.target.value})}
-                      disabled={!isEditing}
-                      className="pl-10 h-10 bg-muted/30 focus-visible:bg-background transition-colors"
-                      placeholder="+1 (555) 000-0000"
-                    />
-                  </div>
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Contact Number</Label>
+                  <p className="text-lg font-semibold flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-primary" />
+                    {user.contactNumber || "Not provided"}
+                  </p>
                 </div>
-                <div className="space-y-2">
-                  <Label>Account Created</Label>
-                  <div className="relative">
-                    <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      value={format(new Date(user.createdAt), "MMMM dd, yyyy")} 
-                      disabled 
-                      className="pl-10 h-10 bg-muted/10 opacity-70"
-                    />
-                  </div>
+                <div className="space-y-1">
+                  <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Member Since</Label>
+                  <p className="text-lg font-semibold flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-primary" />
+                    {format(new Date(user.createdAt), "MMMM dd, yyyy")}
+                  </p>
                 </div>
               </div>
-            </form>
+            </div>
+
+            <div className="pt-6 border-t border-dashed grid grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="space-y-1">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Account ID</Label>
+                <p className="font-mono text-sm">#USR-{user.id.toString().padStart(6, '0')}</p>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Verification</Label>
+                <div className="flex items-center gap-2">
+                  <Badge variant={user.verified ? "default" : "secondary"} className={cn("text-[10px]", user.verified && "bg-emerald-500/10 text-emerald-600 border-none")}>
+                    {user.verified ? "VERIFIED" : "PENDING"}
+                  </Badge>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Status</Label>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-[10px] bg-blue-500/5 text-blue-600 border-blue-200 uppercase">
+                    {user.status}
+                  </Badge>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
