@@ -5,15 +5,18 @@ import { Room, RoomType } from "@/types/room";
 interface RoomState {
     rooms: Room[];
     roomTypes: RoomType[];
+    currentRoomType: RoomType | null;
     isLoading: boolean;
     error: string | null;
     fetchRooms: () => Promise<void>;
     fetchRoomTypes: () => Promise<void>;
+    fetchRoomTypeById: (id: number) => Promise<void>;
 }
 
 export const useRoomStore = create<RoomState>((set) => ({
     rooms: [],
     roomTypes: [],
+    currentRoomType: null,
     isLoading: false,
     error: null,
 
@@ -34,6 +37,16 @@ export const useRoomStore = create<RoomState>((set) => ({
             set({ roomTypes: response.data.data, isLoading: false });
         } catch (error: any) {
             set({ error: error.message || "Failed to fetch room categories", isLoading: false });
+        }
+    },
+
+    fetchRoomTypeById: async (id: number) => {
+        set({ isLoading: true, error: null, currentRoomType: null });
+        try {
+            const response = await axios.get(`/roomCategory/${id}`);
+            set({ currentRoomType: response.data.data, isLoading: false });
+        } catch (error: any) {
+            set({ error: error.message || "Failed to fetch room category details", isLoading: false });
         }
     },
 }));

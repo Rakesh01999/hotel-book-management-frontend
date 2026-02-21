@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 export default function RoomsPage() {
   const { t } = useTranslation();
@@ -80,7 +81,9 @@ export default function RoomsPage() {
                     </span>
                   )}
                 </div>
-                <Button className="w-full">{t("rooms.viewDetail")}</Button>
+                <Link href={`/rooms/${type.id}`}>
+                  <Button className="w-full">{t("rooms.viewDetail")}</Button>
+                </Link>
               </CardContent>
             </Card>
           ))

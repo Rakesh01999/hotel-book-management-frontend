@@ -16,7 +16,7 @@ export const translations = {
             cta: "Explore Our Rooms",
         },
         rooms: {
-            title: "Our Exclusive Rooms",
+            title: "Our Exclusive Room Suites",
             description: "Handpicked selection of our finest accommodations.",
             viewDetail: "View Details",
             perNight: "per night",
@@ -74,6 +74,28 @@ export const translations = {
                 send: "Send Message",
             },
         },
+        faq: {
+            title: "Frequently Asked Questions",
+            subtitle: "Everything you need to know about your stay.",
+            items: [
+                {
+                    q: "What are the check-in and check-out times?",
+                    a: "Check-in starts at 2:00 PM and check-out is until 12:00 PM. Early check-in or late check-out may be available upon request and subject to availability."
+                },
+                {
+                    q: "Do you offer airport transfer services?",
+                    a: "Yes, we provide luxury airport transfers. Please contact our concierge at least 24 hours in advance to arrange your pick-up."
+                },
+                {
+                    q: "Is breakfast included in the room rate?",
+                    a: "It depends on your booking package. Most of our luxury suites include a complimentary gourmet breakfast served in our signature restaurant."
+                },
+                {
+                    q: "What is your cancellation policy?",
+                    a: "Free cancellation is available up to 48 hours before your scheduled arrival for most bookings. Specific policies may vary for promotional or non-refundable rates."
+                }
+            ]
+        },
     },
     id: {
         nav: {
@@ -92,7 +114,7 @@ export const translations = {
             cta: "Jelajahi Kamar Kami",
         },
         rooms: {
-            title: "Kamar Eksklusif Kami",
+            title: "Kategori Kamar Eksklusif Kami",
             description: "Pilihan pilihan akomodasi terbaik kami.",
             viewDetail: "Lihat Detail",
             perNight: "per malam",
@@ -150,6 +172,28 @@ export const translations = {
                 send: "Kirim Pesan",
             },
         },
+        faq: {
+            title: "Pertanyaan yang Sering Diajukan",
+            subtitle: "Segala yang perlu Anda ketahui tentang masa inap Anda.",
+            items: [
+                {
+                    q: "Kapan waktu check-in dan check-out?",
+                    a: "Check-in dimulai pukul 14:00 dan check-out hingga pukul 12:00. Check-in lebih awal atau check-out terlambat mungkin tersedia berdasarkan permintaan."
+                },
+                {
+                    q: "Apakah Anda menawarkan layanan antar-jemput bandara?",
+                    a: "Ya, kami menyediakan layanan antar-jemput bandara mewah. Silakan hubungi concierge kami setidaknya 24 jam sebelumnya."
+                },
+                {
+                    q: "Apakah sarapan sudah termasuk dalam harga kamar?",
+                    a: "Tergantung pada paket pemesanan Anda. Sebagian besar suite mewah kami mencakup sarapan gourmet gratis."
+                },
+                {
+                    q: "Bagaimana kebijakan pembatalan Anda?",
+                    a: "Pembatalan gratis tersedia hingga 48 jam sebelum kedatangan yang dijadwalkan untuk sebagian besar pemesanan."
+                }
+            ]
+        },
     },
     ms: {
         nav: {
@@ -168,7 +212,7 @@ export const translations = {
             cta: "Terokai Bilik Kami",
         },
         rooms: {
-            title: "Bilik Eksklusif Kami",
+            title: "Kategori Bilik Eksklusif Kami",
             description: "Pilihan penginapan terbaik kami yang dipilih sendiri.",
             viewDetail: "Lihat Butiran",
             perNight: "setiap malam",
@@ -226,6 +270,28 @@ export const translations = {
                 send: "Hantar Mesej",
             },
         },
+        faq: {
+            title: "Soalan Lazim",
+            subtitle: "Segala-galanya yang anda perlu tahu tentang penginapan anda.",
+            items: [
+                {
+                    q: "Bilakah waktu daftar masuk dan daftar keluar?",
+                    a: "Daftar masuk bermula pada jam 2:00 petang dan daftar keluar adalah sehingga jam 12:00 tengah hari. Daftar masuk awal atau daftar keluar lewat mungkin tersedia atas permintaan."
+                },
+                {
+                    q: "Adakah anda menawarkan perkhidmatan pemindahan lapangan terbang?",
+                    a: "Ya, kami menyediakan pemindahan lapangan terbang mewah. Sila hubungi concierge kami sekurang-kurangnya 24 jam lebih awal."
+                },
+                {
+                    q: "Adakah sarapan pagi termasuk dalam kadar bilik?",
+                    a: "Ia bergantung pada pakej tempahan anda. Kebanyakan suite mewah kami termasuk sarapan gourmet percuma."
+                },
+                {
+                    q: "Apakah polisi pembatalan anda?",
+                    a: "Pembatalan percuma tersedia sehingga 48 jam sebelum ketibaan berjadual anda untuk kebanyakan tempahan."
+                }
+            ]
+        },
     },
     tr: {
         nav: {
@@ -244,7 +310,7 @@ export const translations = {
             cta: "Odalarımızı Keşfedin",
         },
         rooms: {
-            title: "Özel Odalarımız",
+            title: "Özel Oda Kategorilerimiz",
             description: "En iyi konaklama yerlerimizden özenle seçilmiş seçki.",
             viewDetail: "Detayları Görüntüle",
             perNight: "gecelik",
@@ -302,6 +368,28 @@ export const translations = {
                 send: "Mesaj Gönder",
             },
         },
+        faq: {
+            title: "Sıkça Sorulan Sorular",
+            subtitle: "Konaklamanız hakkında bilmeniz gereken her şey.",
+            items: [
+                {
+                    q: "Giriş dan çıkış saatleri nelerdir?",
+                    a: "Giriş işlemleri saat 14:00'te başlar ve çıkış saat 12:00'ye kadardır. Talep üzerine erken giriş veya geç çıkış imkanları sunulabilir."
+                },
+                {
+                    q: "Havaalanı transfer hizmeti sunuyor musunuz?",
+                    a: "Evet, lüks havaalanı transferleri sağlıyoruz. Lütfen düzenleme yapmak için concierge ekibimizle en az 24 saat önceden iletişime geçin."
+                },
+                {
+                    q: "Kahvaltı oda fiyatına dahil mi?",
+                    a: "Rezervasyon paketinize bağlıdır. Çoğu lüks süitimiz, imza restoranımızda sunulan ücretsiz gurme kahvaltıyı içerir."
+                },
+                {
+                    q: "İptal politikanız nedir?",
+                    a: "Çoğu rezervasyon için planlanan varışınızdan 48 saat öncesine kadar ücretsiz iptal imkanı sunulmaktadır."
+                }
+            ]
+        },
     },
     ar: {
         nav: {
@@ -320,7 +408,7 @@ export const translations = {
             cta: "استكشف غرفنا",
         },
         rooms: {
-            title: "غرفنا الحصرية",
+            title: "فئات غرفنا الحصرية",
             description: "مجموعة مختارة من أفضل أماكن الإقامة لدينا.",
             viewDetail: "عرض التفاصيل",
             perNight: "في الليلة",
@@ -377,6 +465,28 @@ export const translations = {
                 messagePlaceholder: "أخبرنا المزيد عن طلبك...",
                 send: "إرسال الرسالة",
             },
+        },
+        faq: {
+            title: "الأسئلة الشائعة",
+            subtitle: "كل ما تحتاج لمعرفته حول إقامتك.",
+            items: [
+                {
+                    q: "ما هي مواعيد تسجيل الوصول والمغادرة؟",
+                    a: "يبدأ تسجيل الوصول في الساعة 2:00 ظهراً وتسجيل المغادرة حتى الساعة 12:00 ظهراً. قد يتوفر تسجيل الوصول المبكر أو تسجيل المغادرة المتأخر عند الطلب."
+                },
+                {
+                    q: "هل توفرون خدمات النقل من المطار؟",
+                    a: "نعم، نحن نقدم خدمات نقل فاخرة من وإلى المطار. يرجى الاتصال بمسؤول الاستقبال لدينا قبل 24 ساعة على الأقل."
+                },
+                {
+                    q: "هل وجبة الإفطار مشمولة في سعر الغرفة؟",
+                    a: "يعتمد ذلك على باقة الحجز الخاصة بك. تشمل معظم أجنحتنا الفاخرة وجبة إفطار فاخرة مجانية."
+                },
+                {
+                    q: "ما هي سياسة الإلغاء لديكم؟",
+                    a: "يتوفر الإلغاء المجاني حتى 48 ساعة قبل موعد وصولك المقرر لمعظم الحجوزات."
+                }
+            ]
         },
     },
 } as const;

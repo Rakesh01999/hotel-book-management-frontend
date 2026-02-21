@@ -23,11 +23,22 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRoomStore } from "@/store/useRoomStore";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import Image from "next/image";
 
 export default function Home() {
   const { t } = useTranslation();
   const { roomTypes, isLoading, fetchRoomTypes } = useRoomStore();
+  
+  // Cast t to any or specific type to access faq if needed, 
+  // but usually useTranslation returns a proxy or a broad object.
+  // Given the previous usage: t("hero.title")
+  const faqData = (t as any)("faq") || { title: "FAQ", items: [] };
 
   React.useEffect(() => {
     fetchRoomTypes();
@@ -140,7 +151,7 @@ export default function Home() {
                  </Card>
                ))
              ) : (
-               roomTypes.slice(0, 3).map((type) => (
+               roomTypes.slice(0, 3).map((type: any) => (
                  <Card key={type.id} className="overflow-hidden hover:shadow-xl transition-all border-none shadow-md bg-background">
                    <div className="h-64 relative overflow-hidden group">
                       <Image 
@@ -151,7 +162,12 @@ export default function Home() {
                       />
                    </div>
                    <CardHeader>
-                     <CardTitle>{type.name}</CardTitle>
+                     <div className="flex justify-between items-start mb-1">
+                       <CardTitle>{type.name}</CardTitle>
+                       <span className="text-xs font-medium bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                         {type.rooms?.length || 0} {type.rooms?.length === 1 ? "Room" : "Rooms"} Available
+                       </span>
+                     </div>
                      <CardDescription className="line-clamp-2">{type.description}</CardDescription>
                    </CardHeader>
                    <CardContent>
@@ -159,7 +175,7 @@ export default function Home() {
                        <span className="text-lg font-bold text-primary">
                          ${type.price} <span className="text-sm font-normal text-muted-foreground">{t("rooms.perNight")}</span>
                        </span>
-                       <Link href={`/rooms`}>
+                         <Link href={`/rooms/${type.id}`}>
                            <Button size="sm">{t("rooms.viewDetail")}</Button>
                          </Link>
                      </div>
@@ -175,25 +191,22 @@ export default function Home() {
       <section className="py-20 bg-background">
         <div className="container max-w-4xl">
            <div className="text-center mb-12">
-             <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
-             <p className="text-muted-foreground">Everything you need to know about your stay.</p>
+             <h2 className="text-3xl font-bold mb-4">{faqData.title}</h2>
+             <p className="text-muted-foreground">{faqData.subtitle}</p>
            </div>
            
-           <div className="space-y-4">
-             {[
-               "What are the check-in and check-out times?",
-               "Do you offer airport transfer services?",
-               "Is breakfast included in the room rate?",
-               "What is your cancellation policy?"
-             ].map((q, i) => (
-               <Card key={i} className="cursor-pointer hover:bg-muted/50 transition-colors">
-                 <CardContent className="p-4 flex justify-between items-center">
-                   <span className="font-medium">{q}</span>
-                   <HelpCircle className="h-5 w-5 text-muted-foreground" />
-                 </CardContent>
-               </Card>
+           <Accordion type="single" collapsible className="w-full space-y-4">
+             {faqData.items.map((item: any, i: number) => (
+               <AccordionItem key={i} value={`item-${i}`} className="border rounded-lg px-4 bg-muted/20 border-none shadow-sm">
+                 <AccordionTrigger className="hover:no-underline font-medium text-left">
+                   {item.q}
+                 </AccordionTrigger>
+                 <AccordionContent className="text-muted-foreground leading-relaxed pb-4">
+                   {item.a}
+                 </AccordionContent>
+               </AccordionItem>
              ))}
-           </div>
+           </Accordion>
         </div>
       </section>
     </div>
