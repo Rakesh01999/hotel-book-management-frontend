@@ -47,7 +47,7 @@ const Navbar = () => {
       await api.post("/auth/logout");
       logout();
       toast.success("Logged out successfully");
-      router.push("/login");
+      router.push("/");
     } catch (error) {
       console.error("Logout error:", error);
       logout(); // still clear local state

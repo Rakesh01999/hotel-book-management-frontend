@@ -85,7 +85,7 @@ export default function UserDashboardPage() {
           </div>
           <div className="md:ml-auto">
             <Link href="/rooms">
-                <Button variant="secondary" className="font-semibold bg-white text-primary hover:bg-white/90">
+                <Button variant="secondary" className="font-semibold bg-white text-primary hover:bg-white/90 dark:text-black">
                 Book New Stay
                 </Button>
             </Link>

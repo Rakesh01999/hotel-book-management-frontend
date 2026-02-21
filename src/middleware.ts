@@ -32,7 +32,8 @@ export const config = {
     matcher: [
         '/login',
         '/register',
-        '/dashboard/:path*', // Assuming there's a dashboard
-        '/rooms/:path*',    // Protect room booking if needed
+        '/user/:path*', // Protect user dashboard
+        // '/rooms/:path*',    // Protect room booking if needed
+        '/rooms',    
     ],
 };
