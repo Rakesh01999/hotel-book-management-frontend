@@ -9,6 +9,7 @@ interface User {
     verified: boolean;
     status: string;
     profilePhoto?: string | null;
+    contactNumber?: string | null;
     createdAt: string;
 }
 
