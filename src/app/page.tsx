@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight, MapPin, Coffee, HelpCircle, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,7 +34,13 @@ import Image from "next/image";
 
 export default function Home() {
   const { t } = useTranslation();
+  const router = useRouter();
   const { roomTypes, isLoading, fetchRoomTypes } = useRoomStore();
+  
+  // Search state
+  const [checkIn, setCheckIn] = React.useState("");
+  const [checkOut, setCheckOut] = React.useState("");
+  const [guests, setGuests] = React.useState("");
   
   // Cast t to any or specific type to access faq if needed, 
   // but usually useTranslation returns a proxy or a broad object.
@@ -43,6 +50,16 @@ export default function Home() {
   React.useEffect(() => {
     fetchRoomTypes();
   }, [fetchRoomTypes]);
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (checkIn) params.append("checkIn", checkIn);
+    if (checkOut) params.append("checkOut", checkOut);
+    if (guests) params.append("guests", guests);
+    
+    const queryString = params.toString();
+    router.push(queryString ? `/rooms?${queryString}` : "/rooms");
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -67,15 +84,25 @@ export default function Home() {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label className="text-white">Check In</Label>
-                  <Input type="date" className="bg-transparent border-white/50 focus-visible:ring-white text-white placeholder:text-gray-400" />
+                  <Input 
+                    type="date" 
+                    value={checkIn}
+                    onChange={(e) => setCheckIn(e.target.value)}
+                    className="bg-transparent border-white/50 focus-visible:ring-white text-white placeholder:text-gray-400" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-white">Check Out</Label>
-                  <Input type="date" className="bg-transparent border-white/50 focus-visible:ring-white text-white placeholder:text-gray-400" />
+                  <Input 
+                    type="date" 
+                    value={checkOut}
+                    onChange={(e) => setCheckOut(e.target.value)}
+                    className="bg-transparent border-white/50 focus-visible:ring-white text-white placeholder:text-gray-400" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-white">Guests</Label>
-                  <Select>
+                  <Select value={guests} onValueChange={setGuests}>
                     <SelectTrigger className="bg-transparent border-white/50 focus:ring-white text-white">
                       <SelectValue placeholder="Select guests" />
                     </SelectTrigger>
@@ -87,7 +114,11 @@ export default function Home() {
                   </Select>
                 </div>
                 <div className="flex items-end">
-                  <Button size="lg" className="w-full bg-white text-black hover:bg-gray-200">
+                  <Button 
+                    size="lg" 
+                    onClick={handleSearch}
+                    className="w-full bg-white text-black hover:bg-gray-200"
+                  >
                     {t("hero.cta")}
                   </Button>
                 </div>
