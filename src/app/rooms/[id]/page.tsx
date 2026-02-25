@@ -26,7 +26,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Check, Star, Coffee, Wifi, Tv, MapPin, Users, Maximize, Calendar as CalendarIcon, Info, ArrowRight } from "lucide-react";
+import { Check, Star, Coffee, Wifi, Tv, MapPin, Users, Maximize, Calendar as CalendarIcon, Info, ArrowRight, Key } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -42,6 +42,11 @@ export default function RoomDetailsPage() {
   
   const [activeImage, setActiveImage] = React.useState(0);
   const [isBookingModalOpen, setIsBookingModalOpen] = React.useState(false);
+  const [availableRoomsCount, setAvailableRoomsCount] = React.useState<number | null>(null);
+  const [isCheckingAvailability, setIsCheckingAvailability] = React.useState(false);
+  const [bookedRoomIds, setBookedRoomIds] = React.useState<number[]>([]);
+  const [availableRoomsList, setAvailableRoomsList] = React.useState<any[]>([]);
+  const [selectedRoomIds, setSelectedRoomIds] = React.useState<number[]>([]);
   
   // Booking Form State
   const [checkIn, setCheckIn] = React.useState("");
@@ -61,8 +66,70 @@ export default function RoomDetailsPage() {
       router.push("/login?redirect=" + (typeof window !== 'undefined' ? window.location.pathname : ''));
       return;
     }
+    // reset state
+    setCheckIn("");
+    setCheckOut("");
+    setAvailableRoomsCount(null);
+    setBookedRoomIds([]);
+    setSelectedRoomIds([]);
     setIsBookingModalOpen(true);
   };
+
+  React.useEffect(() => {
+    const checkRoomAvailability = async () => {
+      if (checkIn && checkOut) {
+        setIsCheckingAvailability(true);
+        try {
+          const { useBookingStore } = await import("@/store/useBookingStore");
+          const store = useBookingStore.getState();
+          const result = await store.checkAvailability(checkIn, checkOut);
+          const specificRoomsResult = await store.checkSpecificRoomsStatus(checkIn, checkOut);
+          
+          if (result.success && result.data) {
+            const roomData = result.data.find((r: any) => r.roomTypeId === Number(id));
+            if (roomData) {
+              setAvailableRoomsCount(roomData.availableRooms);
+            } else {
+              setAvailableRoomsCount(0); // If not found, assume 0
+            }
+          }
+
+          if (specificRoomsResult.success && specificRoomsResult.data && specificRoomsResult.data.booked) {
+              setBookedRoomIds(specificRoomsResult.data.booked.map((r: any) => r.roomId));
+          } else {
+              setBookedRoomIds([]);
+          }
+
+          if (specificRoomsResult.success && specificRoomsResult.data && specificRoomsResult.data.available) {
+              const { useRoomStore } = await import("@/store/useRoomStore");
+              const currentTypeRooms = useRoomStore.getState().currentRoomType?.rooms || [];
+              const validRoomIds = new Set(currentTypeRooms.map((r: any) => r.id));
+              const filteredAvailableRooms = specificRoomsResult.data.available.filter((r: any) => validRoomIds.has(r.roomId));
+              setAvailableRoomsList(filteredAvailableRooms);
+          } else {
+              setAvailableRoomsList([]);
+          }
+          // Clear selections when dates change
+          setSelectedRoomIds([]);
+        } catch (error) {
+          console.error("Error checking availability:", error);
+          setAvailableRoomsCount(0);
+          setBookedRoomIds([]);
+          setAvailableRoomsList([]);
+          setSelectedRoomIds([]);
+        } finally {
+          setIsCheckingAvailability(false);
+        }
+      } else {
+        setAvailableRoomsCount(null);
+        setBookedRoomIds([]);
+        setAvailableRoomsList([]);
+        setSelectedRoomIds([]);
+      }
+    };
+
+    checkRoomAvailability();
+  }, [checkIn, checkOut, id]);
 
   const handleBooking = async () => {
     if (!checkIn || !checkOut) {
@@ -77,11 +144,16 @@ export default function RoomDetailsPage() {
       toast.error("Check-out date must be after check-in date");
       return;
     }
+    
+    if (selectedRoomIds.length === 0) {
+      toast.error("Please select at least one available room");
+      return;
+    }
 
     const bookingData = {
       userId: user?.id,
       roomRequests: [
-        { roomTypeId: Number(id), quantity: 1 }
+        { roomTypeId: Number(id), quantity: selectedRoomIds.length }
       ],
       checkIn: checkInDate.toISOString(),
       checkOut: checkOutDate.toISOString(),
@@ -98,6 +170,9 @@ export default function RoomDetailsPage() {
       toast.success("Booking successful!");
       setIsBookingModalOpen(false);
       router.push("/user/bookings");
+    } else {
+      const { useBookingStore } = await import("@/store/useBookingStore");
+      toast.error(useBookingStore.getState().error || "Booking failed. Please try again.");
     }
   };
 
@@ -213,6 +288,49 @@ export default function RoomDetailsPage() {
               ))}
             </div>
           </div>
+
+          <Separator />
+
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold">Specific Rooms</h2>
+            {currentRoomType.rooms && currentRoomType.rooms.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {currentRoomType.rooms.map((room) => {
+                  const isBooked = bookedRoomIds.includes(room.id);
+                  const isAvailableChecked = availableRoomsCount !== null; // True if dates are fully selected
+                  
+                  return (
+                    <div 
+                      key={room.id} 
+                      className={`flex flex-col items-center justify-center p-4 rounded-xl transition-colors border shadow-sm group ${
+                        !isAvailableChecked 
+                          ? "bg-muted/30 border-transparent hover:bg-muted/50 hover:border-primary/20" 
+                          : isBooked 
+                            ? "bg-destructive/10 border-destructive/20 text-destructive"
+                            : "bg-green-500/10 border-green-500/20 text-green-600"
+                      }`}
+                    >
+                      <div className={`h-10 w-10 rounded-full flex items-center justify-center mb-2 transition-transform ${
+                        !isAvailableChecked ? "bg-primary/10 group-hover:scale-110" : isBooked ? "bg-destructive/20 opacity-50" : "bg-green-500/20 group-hover:scale-110"
+                      }`}>
+                        <Key className={`h-5 w-5 ${!isAvailableChecked ? "text-primary" : isBooked ? "text-destructive" : "text-green-600"}`} />
+                      </div>
+                      <span className="font-semibold text-md">Room {room.roomNumber}</span>
+                      {isAvailableChecked && (
+                        <span className="text-[10px] uppercase tracking-wider font-bold mt-1 opacity-80">
+                          {isBooked ? "Booked" : "Available"}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="p-6 bg-muted/20 rounded-xl text-center border border-dashed border-muted-foreground/30">
+                <p className="text-muted-foreground">No specific rooms currently available for this category.</p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Sidebar / Booking Card */}
@@ -277,6 +395,18 @@ export default function RoomDetailsPage() {
           </DialogHeader>
           
           <div className="p-6 space-y-6">
+            {availableRoomsCount !== null && (
+              <div className={`p-3 rounded-lg text-sm font-medium text-center ${
+                availableRoomsCount > 0 
+                  ? "bg-green-500/10 text-green-600 border border-green-500/20" 
+                  : "bg-destructive/10 text-destructive border border-destructive/20"
+              }`}>
+                {availableRoomsCount > 0 
+                  ? `${availableRoomsCount} room(s) available for these dates!` 
+                  : "Sold Out for the selected dates."}
+              </div>
+            )}
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="checkIn" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Check In</Label>
@@ -285,6 +415,7 @@ export default function RoomDetailsPage() {
                   <Input 
                     id="checkIn" 
                     type="date" 
+                    min={new Date().toISOString().split('T')[0]}
                     value={checkIn}
                     onChange={(e) => setCheckIn(e.target.value)}
                     className="pl-10 h-10 bg-muted/30 focus-visible:bg-background transition-colors" 
@@ -299,6 +430,7 @@ export default function RoomDetailsPage() {
                   <Input 
                     id="checkOut" 
                     type="date" 
+                    min={checkIn || new Date().toISOString().split('T')[0]}
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
                     className="pl-10 h-10 bg-muted/30 focus-visible:bg-background transition-colors" 
@@ -335,17 +467,50 @@ export default function RoomDetailsPage() {
                 </Select>
               </div>
             </div>
+            
+            {availableRoomsList.length > 0 && checkIn && checkOut && (
+              <div className="space-y-3 pt-2">
+                <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
+                  <span>Select Specific Rooms</span>
+                  <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full">{selectedRoomIds.length} Selected</span>
+                </Label>
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-[120px] overflow-y-auto p-1 scrollbar-thin scrollbar-thumb-primary/20">
+                  {availableRoomsList.map((room) => {
+                    const isSelected = selectedRoomIds.includes(room.roomId);
+                    return (
+                      <button
+                        key={room.roomId}
+                        onClick={() => {
+                          if (isSelected) {
+                            setSelectedRoomIds(selectedRoomIds.filter(id => id !== room.roomId));
+                          } else {
+                            setSelectedRoomIds([...selectedRoomIds, room.roomId]);
+                          }
+                        }}
+                        className={`flex items-center justify-center py-2 px-1 text-xs font-medium rounded-lg border transition-all ${
+                          isSelected 
+                            ? "bg-primary text-primary-foreground border-primary shadow-sm" 
+                            : "bg-muted/30 border-transparent hover:border-primary/30 hover:bg-muted/50 text-muted-foreground"
+                        }`}
+                      >
+                        Room {room.roomNumber}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 space-y-2">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-muted-foreground">Price per night</span>
                 <span className="font-bold">${currentRoomType.price}</span>
               </div>
-              {checkIn && checkOut && (
+              {checkIn && checkOut && selectedRoomIds.length > 0 && (
                 <div className="flex justify-between items-center text-base border-t border-primary/10 pt-2">
                   <span className="font-semibold text-primary">Total Amount</span>
                   <span className="text-xl font-bold text-primary">
-                    ${currentRoomType.price * Math.max(1, Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 3600 * 24)))}
+                    ${currentRoomType.price * selectedRoomIds.length * Math.max(1, Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 3600 * 24)))}
                   </span>
                 </div>
               )}
@@ -353,10 +518,11 @@ export default function RoomDetailsPage() {
 
             <Button 
               onClick={handleBooking} 
-              isLoading={isBookingLoading}
+              disabled={availableRoomsCount === 0 || isCheckingAvailability || selectedRoomIds.length === 0}
+              isLoading={isBookingLoading || isCheckingAvailability}
               className="w-full h-12 text-lg font-semibold shadow-lg shadow-primary/20"
             >
-              Confirm & Book Now
+              {availableRoomsCount === 0 ? "Sold Out" : selectedRoomIds.length === 0 ? "Select a Room" : "Confirm & Book Now"}
             </Button>
             
             <p className="text-center text-[10px] text-muted-foreground italic leading-tight">

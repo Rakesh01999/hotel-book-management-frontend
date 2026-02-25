@@ -12,6 +12,21 @@ interface BookingState {
     setGuests: (guests: { adults: number; children: number }) => void;
     fetchUserBookings: (userId: number) => Promise<void>;
     createBooking: (bookingData: any) => Promise<{ url?: string; success: boolean }>;
+    checkAvailability: (checkIn: string, checkOut: string) => Promise<{
+        success: boolean;
+        data?: Array<{
+            roomTypeId: number;
+            totalRooms: number;
+            availableRooms: number;
+        }>;
+    }>;
+    checkSpecificRoomsStatus: (checkIn: string, checkOut: string) => Promise<{
+        success: boolean;
+        data?: {
+            available: Array<{ roomId: number, roomNumber: number }>;
+            booked: Array<{ roomId: number, roomNumber: number }>;
+        };
+    }>;
     resetBooking: () => void;
 }
 
@@ -47,6 +62,30 @@ export const useBookingStore = create<BookingState>((set) => ({
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || error.message || "Booking failed";
             set({ error: errorMessage, isLoading: false });
+            return { success: false };
+        }
+    },
+
+    checkAvailability: async (checkIn: string, checkOut: string) => {
+        try {
+            const response = await axios.get('/book/available-rooms', {
+                params: { checkIn, checkOut }
+            });
+            return { success: true, data: response.data.data };
+        } catch (error: any) {
+            console.error("Failed to check availability:", error);
+            return { success: false };
+        }
+    },
+
+    checkSpecificRoomsStatus: async (checkIn: string, checkOut: string) => {
+        try {
+            const response = await axios.get('/book/roomsDate', {
+                params: { checkIn, checkOut }
+            });
+            return { success: true, data: response.data.data };
+        } catch (error: any) {
+            console.error("Failed to check specific rooms status:", error);
             return { success: false };
         }
     },
