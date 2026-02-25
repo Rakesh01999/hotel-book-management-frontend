@@ -129,16 +129,6 @@ export default function RoomCategoriesPage() {
     try {
       const facilitiesArray = formData.facilities.split(",").map(f => f.trim()).filter(f => f !== "");
       
-      const payload = new FormData();
-      payload.append("name", formData.name);
-      payload.append("description", formData.description);
-      payload.append("price", formData.price);
-      payload.append("facilities", JSON.stringify(facilitiesArray));
-      
-      selectedFiles.forEach((file) => {
-        payload.append("images", file);
-      });
-
       if (editingCategory) {
         // Special case: update might not support FormData in some backends if using PATCH
         // Let's check backend controller logic for update
@@ -150,6 +140,22 @@ export default function RoomCategoriesPage() {
         });
         toast.success("Category updated");
       } else {
+        const payload = new FormData();
+        
+        // Backend expects details in a 'body' field as a JSON string
+        const categoryDetails = {
+          name: formData.name,
+          description: formData.description,
+          price: Number(formData.price),
+          facilities: facilitiesArray
+        };
+        
+        payload.append("body", JSON.stringify(categoryDetails));
+        
+        selectedFiles.forEach((file) => {
+          payload.append("images", file);
+        });
+
         await api.post("/roomCategory", payload, {
           headers: { "Content-Type": "multipart/form-data" },
         });
