@@ -1,26 +1,20 @@
 import {
     Wifi,
     Coffee,
-    Wind,
     Tv,
     Utensils,
     Bath,
     ShieldCheck,
     Zap,
     Waves,
-    CigaretteOff,
-    Gamepad2,
     Wine,
-    Airplay,
     DoorOpen,
-    Briefcase,
     Smartphone,
-    Flame,
     Snowflake,
-    Refrigerator
+    type LucideIcon
 } from "lucide-react";
 
-export const amenityMapping: Record<string, { icon: any, image?: string, description: string }> = {
+export const amenityMapping: Record<string, { icon: LucideIcon, image?: string, description: string }> = {
     "free wi-fi": {
         icon: Wifi,
         description: "High-speed internet access throughout the hotel premises and in all guest rooms."

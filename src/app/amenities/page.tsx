@@ -95,7 +95,7 @@ export default function AmenitiesPage() {
           <h2 className="text-4xl font-bold tracking-tight sm:text-5xl mb-6">Experience the Extraordinary</h2>
           <div className="h-1 w-24 bg-primary mx-auto rounded-full mb-8" />
           <p className="text-muted-foreground max-w-3xl mx-auto text-lg">
-            Our commitment to excellence is reflected in every service we provide. Whether you're here for business or leisure, our amenities are designed to exceed your expectations.
+            Our commitment to excellence is reflected in every service we provide. Whether you&apos;re here for business or leisure, our amenities are designed to exceed your expectations.
           </p>
         </div>
 

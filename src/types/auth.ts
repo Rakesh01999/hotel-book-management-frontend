@@ -2,7 +2,8 @@ export interface User {
     id: number;
     name: string;
     email: string;
-    role: "USER" | "ADMIN";
+    role: "USER" | "ADMIN" | "PREMIUM_USER";
+
     verified: boolean;
     status: "ACTIVE" | "BLOCKED" | "DELETED";
     profilePhoto?: string | null;

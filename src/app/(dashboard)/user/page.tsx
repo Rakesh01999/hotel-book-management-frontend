@@ -33,6 +33,8 @@ export default function UserDashboardPage() {
 
   if (!user) return null;
 
+  const firstName = user.name.split(' ')[0];
+
   const stats = [
     { 
       label: "Total Bookings", 
@@ -78,7 +80,7 @@ export default function UserDashboardPage() {
             </AvatarFallback>
           </Avatar>
           <div className="text-center md:text-left space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">Welcome back, {user.name.split(' ')[0]}!</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Welcome back, {firstName}!</h1>
             <p className="text-white/80 max-w-lg">
               It's great to see you again. Manage your luxury stays and explore exclusive member rewards from your personal dashboard.
             </p>
@@ -215,7 +217,7 @@ export default function UserDashboardPage() {
                     <div className="relative z-10 space-y-2">
                         <h3 className="text-lg font-bold">LuxeLoyalty Rewards</h3>
                         <p className="text-primary-foreground/80 text-sm">
-                            You're only <span className="font-bold text-white">2 stays</span> away from reaching <span className="underline decoration-2 underline-offset-4 decoration-amber-400">Gold Status</span>!
+                            You&apos;re only <span className="font-bold text-white">2 stays</span> away from reaching <span className="underline decoration-2 underline-offset-4 decoration-amber-400">Gold Status</span>!
                         </p>
                     </div>
                     <Button variant="secondary" className="w-full font-bold shadow-sm" size="sm">

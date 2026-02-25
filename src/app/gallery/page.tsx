@@ -170,7 +170,7 @@ export default function GalleryPage() {
             </div>
             <h3 className="text-xl font-semibold mb-2">The gallery is currently being curated</h3>
             <p className="text-muted-foreground max-w-md mx-auto">
-              We're currently gathering the finest captures of our spaces. Please check back soon for the full visual experience.
+              We&apos;re currently gathering the finest captures of our spaces. Please check back soon for the full visual experience.
             </p>
           </div>
         )}

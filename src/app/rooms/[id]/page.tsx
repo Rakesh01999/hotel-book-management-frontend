@@ -51,7 +51,7 @@ function RoomDetails() {
   const [availableRoomsCount, setAvailableRoomsCount] = React.useState<number | null>(null);
   const [isCheckingAvailability, setIsCheckingAvailability] = React.useState(false);
   const [bookedRoomIds, setBookedRoomIds] = React.useState<number[]>([]);
-  const [availableRoomsList, setAvailableRoomsList] = React.useState<any[]>([]);
+  const [availableRoomsList, setAvailableRoomsList] = React.useState<{ roomId: number; roomNumber: number }[]>([]);
   const [selectedRoomIds, setSelectedRoomIds] = React.useState<number[]>([]);
   
   // Booking Form State
@@ -207,7 +207,7 @@ function RoomDetails() {
     return (
       <div className="container py-20 text-center space-y-4">
         <h2 className="text-3xl font-bold">Room not found</h2>
-        <p className="text-muted-foreground">We couldn't find the room you're looking for.</p>
+        <p className="text-muted-foreground">We couldn&apos;t find the room you&apos;re looking for.</p>
         <Link href="/rooms">
           <Button>Back to Rooms</Button>
         </Link>

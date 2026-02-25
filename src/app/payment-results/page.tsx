@@ -44,7 +44,8 @@ export default function PaymentResultsPage() {
             {isSuccess 
               ? "Your luxury stay has been confirmed. Get ready for an unforgettable experience."
               : isFailed 
-              ? "We couldn't process your payment. Please try again or contact support."
+              ? "We couldn&apos;t process your payment. Please try again or contact support."
+
               : "Your payment is currently being processed."}
           </p>
         </CardHeader>

@@ -14,6 +14,7 @@ import { Eye, EyeOff } from "lucide-react";
 
 import { toast } from "sonner";
 import api from "@/lib/axios";
+import Cookies from "js-cookie";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -44,6 +45,10 @@ export default function LoginPage() {
     try {
       const response = await api.post("/auth/login", data);
       const { user, accessToken } = response.data.data;
+      
+      // Set the token in a client-side accessible cookie for the middleware
+      Cookies.set("accessToken", accessToken, { expires: 7 }); 
+      
       login(user, accessToken);
       toast.success("Logged in successfully!");
       router.push("/");

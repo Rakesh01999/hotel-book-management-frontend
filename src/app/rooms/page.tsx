@@ -18,7 +18,8 @@ function RoomsList() {
   const checkInQuery = searchParams.get("checkIn");
   const checkOutQuery = searchParams.get("checkOut");
 
-  const [availabilityData, setAvailabilityData] = React.useState<any[]>([]);
+  const [availabilityData, setAvailabilityData] = React.useState<{ roomTypeId: number; availableRooms: number }[]>([]);
+
   const [isCheckingAvailability, setIsCheckingAvailability] = React.useState(false);
 
   React.useEffect(() => {

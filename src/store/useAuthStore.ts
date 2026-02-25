@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import Cookies from 'js-cookie';
 
 import { User } from '@/types/auth'; // Import from central types
 /* Removing local User interface */
@@ -21,7 +22,10 @@ export const useAuthStore = create<AuthState>()(
             accessToken: null,
             isAuthenticated: false,
             login: (user, accessToken) => set({ user, accessToken, isAuthenticated: true }),
-            logout: () => set({ user: null, accessToken: null, isAuthenticated: false }),
+            logout: () => {
+                Cookies.remove('accessToken');
+                set({ user: null, accessToken: null, isAuthenticated: false });
+            },
             updateUser: (updates) =>
                 set((state) => ({
                     user: state.user ? { ...state.user, ...updates } : null,
