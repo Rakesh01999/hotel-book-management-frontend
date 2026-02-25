@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Menu, X, DollarSign, LogOut, Settings, LayoutDashboard } from "lucide-react";
@@ -98,23 +99,30 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center space-x-2">
-          <span className="text-xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-            LuxeStay
-          </span>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 shadow-sm">
+      <div className="container flex h-20 items-center justify-between">
+        <Link href="/" className="flex items-center group">
+          <div className="relative p-1 rounded-lg bg-slate-900 shadow-lg ring-1 ring-amber-400/20 transition-all duration-300 group-hover:bg-black overflow-hidden transform group-hover:scale-105">
+            <Image 
+              src="/hotel_logo.png" 
+              alt="LuxeStay Logo" 
+              width={180} 
+              height={50} 
+              className="h-12 w-auto object-contain brightness-110"
+              priority
+            />
+          </div>
         </Link>
         
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden lg:flex items-center gap-8">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className={cn(
-                "text-sm font-medium transition-colors hover:text-primary",
-                pathname === link.href ? "text-primary" : "text-muted-foreground"
+                "text-[15px] font-bold tracking-tight transition-all hover:text-primary relative py-1 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all hover:after:w-full",
+                pathname === link.href ? "text-primary after:w-full" : "text-muted-foreground/90"
               )}
             >
               {link.label}
