@@ -78,7 +78,7 @@ const Navbar = () => {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => router.push("/user")}>
+          <DropdownMenuItem onClick={() => router.push(user.role === 'ADMIN' ? "/admin" : "/user")}>
             <LayoutDashboard className="mr-2 h-4 w-4" />
             <span>Dashboard</span>
           </DropdownMenuItem>
@@ -205,6 +205,14 @@ const Navbar = () => {
                       <p className="text-xs text-muted-foreground">{user.email}</p>
                     </div>
                   </div>
+                  <Button variant="ghost" className="w-full justify-start mt-2" onClick={() => { setIsOpen(false); router.push(user.role === 'ADMIN' ? "/admin" : "/user"); }}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start" onClick={() => { setIsOpen(false); router.push("/user/settings"); }}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Profile Settings
+                  </Button>
                   <Button variant="ghost" className="w-full justify-start text-destructive" onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Logout
