@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import api from '@/lib/axios';
+import { Booking } from '@/types/booking';
+import { User } from '@/types/auth';
 
 interface DashboardStats {
     totalBookings: number;
@@ -30,11 +32,10 @@ export const useAdminStore = create<AdminState>((set) => ({
                 api.get('/room')
             ]);
 
-            const allBookings = bookingsRes.data?.data?.data || [];
+            const allBookings: Booking[] = bookingsRes.data?.data?.data || [];
             const totalBookings = bookingsRes.data?.data?.meta?.total || 0;
 
-            const revenue = allBookings.reduce((sum: number, booking: any) => {
-                // usually we only sum confirmed or completed bookings, but for demo we sum all non-cancelled
+            const revenue = allBookings.reduce((sum: number, booking: Booking) => {
                 if (booking.status !== 'CANCELLED') {
                     return sum + (booking.totalAmount || 0);
                 }
@@ -42,7 +43,7 @@ export const useAdminStore = create<AdminState>((set) => ({
             }, 0);
 
             const activeUsers = Array.isArray(usersRes.data?.data)
-                ? usersRes.data.data.filter((u: any) => u.status === 'ACTIVE').length
+                ? (usersRes.data.data as User[]).filter((u: User) => u.status === 'ACTIVE').length
                 : (usersRes.data?.data?.length || 0);
 
             const totalRooms = Array.isArray(roomsRes.data?.data)
@@ -58,10 +59,11 @@ export const useAdminStore = create<AdminState>((set) => ({
                 },
                 isLoading: false
             });
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Failed to fetch admin dashboard stats:', error);
+            const message = error instanceof Error ? error.message : 'Failed to load dashboard statistics';
             set({
-                error: error.response?.data?.message || 'Failed to load dashboard statistics',
+                error: message,
                 isLoading: false
             });
         }

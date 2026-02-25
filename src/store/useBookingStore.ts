@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import axios from '@/lib/axios';
-import { Booking } from '@/types/booking';
+import { Booking, BookingRequest } from '@/types/booking';
+
 
 interface BookingState {
     dates: { from: Date | undefined; to: Date | undefined };
@@ -11,7 +12,7 @@ interface BookingState {
     setDates: (dates: { from: Date | undefined; to: Date | undefined }) => void;
     setGuests: (guests: { adults: number; children: number }) => void;
     fetchUserBookings: (userId: number) => Promise<void>;
-    createBooking: (bookingData: any) => Promise<{ url?: string; success: boolean }>;
+    createBooking: (bookingData: BookingRequest) => Promise<{ url?: string; success: boolean }>;
     checkAvailability: (checkIn: string, checkOut: string) => Promise<{
         success: boolean;
         data?: Array<{
@@ -44,8 +45,9 @@ export const useBookingStore = create<BookingState>((set) => ({
         try {
             const response = await axios.get(`/book?searchTerm=${userId}`);
             set({ userBookings: response.data.data.data, isLoading: false });
-        } catch (error: any) {
-            set({ error: error.message || "Failed to fetch bookings", isLoading: false });
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Failed to fetch bookings";
+            set({ error: message, isLoading: false });
         }
     },
 
@@ -59,9 +61,10 @@ export const useBookingStore = create<BookingState>((set) => ({
                 url: response.data.data.url,
                 success: true
             };
-        } catch (error: any) {
-            const errorMessage = error.response?.data?.message || error.message || "Booking failed";
-            set({ error: errorMessage, isLoading: false });
+        } catch (error: unknown) {
+            console.error("Booking error:", error);
+            const message = error instanceof Error ? error.message : "Booking failed";
+            set({ error: message, isLoading: false });
             return { success: false };
         }
     },
@@ -72,7 +75,7 @@ export const useBookingStore = create<BookingState>((set) => ({
                 params: { checkIn, checkOut }
             });
             return { success: true, data: response.data.data };
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Failed to check availability:", error);
             return { success: false };
         }
@@ -84,7 +87,7 @@ export const useBookingStore = create<BookingState>((set) => ({
                 params: { checkIn, checkOut }
             });
             return { success: true, data: response.data.data };
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error("Failed to check specific rooms status:", error);
             return { success: false };
         }

@@ -1,17 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    verified: boolean;
-    status: string;
-    profilePhoto?: string | null;
-    contactNumber?: string | null;
-    createdAt: string;
-}
+import { User } from '@/types/auth'; // Import from central types
+/* Removing local User interface */
+
 
 interface AuthState {
     user: User | null;

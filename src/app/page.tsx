@@ -17,6 +17,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useRoomStore } from "@/store/useRoomStore";
+import { RoomType } from "@/types/room";
+
 import {
   Accordion,
   AccordionContent,
@@ -34,10 +36,13 @@ export default function Home() {
   const [checkIn, setCheckIn] = React.useState("");
   const [checkOut, setCheckOut] = React.useState("");
   
-  // Cast t to any or specific type to access faq if needed, 
-  // but usually useTranslation returns a proxy or a broad object.
-  // Given the previous usage: t("hero.title")
-  const faqData = (t as any)("faq") || { title: "FAQ", items: [] };
+  interface FAQData {
+    title: string;
+    subtitle?: string;
+    items: Array<{ q: string; a: string }>;
+  }
+  
+  const faqData = (t("faq") as unknown as FAQData) || { title: "FAQ", items: [] };
 
   React.useEffect(() => {
     fetchRoomTypes();
@@ -160,7 +165,7 @@ export default function Home() {
                  </Card>
                ))
              ) : (
-               roomTypes.slice(0, 3).map((type: any) => (
+               roomTypes.slice(0, 3).map((type: RoomType) => (
                  <Card key={type.id} className="overflow-hidden hover:shadow-xl transition-all border-none shadow-md bg-background">
                    <div className="h-64 relative overflow-hidden group">
                       <Image 
@@ -205,7 +210,7 @@ export default function Home() {
            </div>
            
            <Accordion type="single" collapsible className="w-full space-y-4">
-             {faqData.items.map((item: any, i: number) => (
+             {faqData.items.map((item: { q: string; a: string }, i: number) => (
                <AccordionItem key={i} value={`item-${i}`} className="border rounded-lg px-4 bg-muted/20 border-none shadow-sm">
                  <AccordionTrigger className="hover:no-underline font-medium text-left">
                    {item.q}

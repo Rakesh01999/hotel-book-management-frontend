@@ -19,11 +19,14 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
                     login(response.data.data, ""); 
                     console.log("AuthProvider: Logged in as:", response.data.data.email);
                 }
-            } catch (error: any) {
-                console.log("AuthProvider: session check failed", error.response?.status || error.message);
-                // Only logout if explicitly unauthorized, otherwise might be a network/server flit
-                if (error.response?.status === 401 || error.response?.status === 403) {
-                    if (isAuthenticated) logout();
+            } catch (error: unknown) {
+                console.log("AuthProvider: session check failed");
+                // Only logout if explicitly unauthorized
+                if (error && typeof error === 'object' && 'response' in error) {
+                    const axiosError = error as { response?: { status: number } };
+                    if (axiosError.response?.status === 401 || axiosError.response?.status === 403) {
+                        if (isAuthenticated) logout();
+                    }
                 }
             } finally {
                 setIsLoading(false);

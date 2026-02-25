@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
+import { Room } from "@/types/room";
 import { useRoomStore } from "@/store/useRoomStore";
 import { useBookingStore } from "@/store/useBookingStore";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -93,7 +94,7 @@ function RoomDetails() {
           const specificRoomsResult = await store.checkSpecificRoomsStatus(checkIn, checkOut);
           
           if (result.success && result.data) {
-            const roomData = result.data.find((r: any) => r.roomTypeId === Number(id));
+            const roomData = result.data.find((r: { roomTypeId: number; availableRooms: number }) => r.roomTypeId === Number(id));
             if (roomData) {
               setAvailableRoomsCount(roomData.availableRooms);
             } else {
@@ -102,7 +103,7 @@ function RoomDetails() {
           }
 
           if (specificRoomsResult.success && specificRoomsResult.data && specificRoomsResult.data.booked) {
-              setBookedRoomIds(specificRoomsResult.data.booked.map((r: any) => r.roomId));
+              setBookedRoomIds(specificRoomsResult.data.booked.map((r: { roomId: number }) => r.roomId));
           } else {
               setBookedRoomIds([]);
           }
@@ -110,8 +111,8 @@ function RoomDetails() {
           if (specificRoomsResult.success && specificRoomsResult.data && specificRoomsResult.data.available) {
               const { useRoomStore } = await import("@/store/useRoomStore");
               const currentTypeRooms = useRoomStore.getState().currentRoomType?.rooms || [];
-              const validRoomIds = new Set(currentTypeRooms.map((r: any) => r.id));
-              const filteredAvailableRooms = specificRoomsResult.data.available.filter((r: any) => validRoomIds.has(r.roomId));
+              const validRoomIds = new Set(currentTypeRooms.map((r: Room) => r.id));
+              const filteredAvailableRooms = specificRoomsResult.data.available.filter((r: { roomId: number }) => validRoomIds.has(r.roomId));
               setAvailableRoomsList(filteredAvailableRooms);
           } else {
               setAvailableRoomsList([]);

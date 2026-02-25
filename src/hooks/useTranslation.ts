@@ -9,11 +9,11 @@ export function useTranslation() {
 
     const t = (path: string) => {
         const keys = path.split(".");
-        let result: any = translations[code];
+        let result = translations[code] as unknown;
 
         for (const key of keys) {
-            if (result && result[key]) {
-                result = result[key];
+            if (result && typeof result === 'object' && (result as Record<string, unknown>)[key]) {
+                result = (result as Record<string, unknown>)[key];
             } else {
                 return path; // Fallback to key if not found
             }

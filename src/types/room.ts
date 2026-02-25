@@ -3,7 +3,7 @@ export interface Room {
     roomNumber: number;
     roomTypeId: number;
     roomType: RoomType;
-    bookings?: any[];
+    bookings?: unknown[];
 }
 
 export interface RoomType {

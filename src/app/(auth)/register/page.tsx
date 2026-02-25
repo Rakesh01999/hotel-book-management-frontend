@@ -53,9 +53,13 @@ export default function RegisterPage() {
       
       toast.success("Registration successful! Please check your email to verify your account.");
       router.push("/login");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Registration error:", error);
-      const message = error.response?.data?.message || "Registration failed. Please try again.";
+      let message = "Registration failed. Please try again.";
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        message = axiosError.response?.data?.message || message;
+      }
       toast.error(message);
     } finally {
       setIsLoading(false);

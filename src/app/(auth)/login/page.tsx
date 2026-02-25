@@ -47,9 +47,13 @@ export default function LoginPage() {
       login(user, accessToken);
       toast.success("Logged in successfully!");
       router.push("/");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Login error:", error);
-      const message = error.response?.data?.message || "Something went wrong. Please try again.";
+      let message = "Something went wrong. Please try again.";
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        message = axiosError.response?.data?.message || message;
+      }
       toast.error(message);
     } finally {
       setIsLoading(false);

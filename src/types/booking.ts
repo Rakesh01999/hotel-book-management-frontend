@@ -1,3 +1,4 @@
+import { User } from "./auth";
 import { Room } from "./room";
 
 export interface BookingRoom {
@@ -13,13 +14,14 @@ export interface Booking {
     checkIn: string;
     checkOut: string;
     totalAmount: number;
-    status: 'PENDING_PAYMENT' | 'CONFIRMED' | 'CANCELLED';
+    status: 'PENDING_PAYMENT' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'PENDING';
     adults: number;
     children: number;
     currency: string;
     paymentId?: string;
     createdAt: string;
-    rooms: BookingRoom[];
+    rooms?: BookingRoom[];
+    user?: User;
 }
 
 export interface BookingApiResponse {
@@ -34,3 +36,18 @@ export interface BookingApiResponse {
         data: Booking[];
     };
 }
+
+export interface RoomRequest {
+    roomTypeId: number;
+    quantity: number;
+}
+
+export interface BookingRequest {
+    userId?: number;
+    roomRequests: RoomRequest[];
+    checkIn: string;
+    checkOut: string;
+    adults: number;
+    children: number;
+}
+

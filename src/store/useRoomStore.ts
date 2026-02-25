@@ -25,8 +25,9 @@ export const useRoomStore = create<RoomState>((set) => ({
         try {
             const response = await axios.get("/room");
             set({ rooms: response.data.data, isLoading: false });
-        } catch (error: any) {
-            set({ error: error.message || "Failed to fetch rooms", isLoading: false });
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Failed to fetch rooms";
+            set({ error: message, isLoading: false });
         }
     },
 
@@ -35,8 +36,9 @@ export const useRoomStore = create<RoomState>((set) => ({
         try {
             const response = await axios.get("/roomCategory");
             set({ roomTypes: response.data.data, isLoading: false });
-        } catch (error: any) {
-            set({ error: error.message || "Failed to fetch room categories", isLoading: false });
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Failed to fetch room categories";
+            set({ error: message, isLoading: false });
         }
     },
 
@@ -45,8 +47,9 @@ export const useRoomStore = create<RoomState>((set) => ({
         try {
             const response = await axios.get(`/roomCategory/${id}`);
             set({ currentRoomType: response.data.data, isLoading: false });
-        } catch (error: any) {
-            set({ error: error.message || "Failed to fetch room category details", isLoading: false });
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Failed to fetch room category details";
+            set({ error: message, isLoading: false });
         }
     },
 }));
