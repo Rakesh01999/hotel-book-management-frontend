@@ -193,7 +193,7 @@ export default function AmenitiesPage() {
               </div>
 
               <div className="pt-4">
-                <Button size="lg" className="px-8 rounded-full shadow-lg hover:shadow-primary/20 transition-all">
+                <Button size="lg" className="px-8 rounded-full shadow-lg hover:shadow-primary/20 transition-all"  onClick={() => (window.location.href = '/rooms')}>
                   Book Your Experience
                 </Button>
               </div>
