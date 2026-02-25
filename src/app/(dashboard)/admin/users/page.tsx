@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, UserMinus, ShieldAlert, Mail } from "lucide-react";
+import { Search, UserMinus, ShieldAlert, Mail, Ban, CheckCircle } from "lucide-react";
 import api from "@/lib/axios";
 import { toast } from "sonner";
 import { User } from "@/types/auth"; // Central type
@@ -32,6 +32,9 @@ export default function AdminUsersPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [statusAction, setStatusAction] = useState<{ id: number, status: 'ACTIVE' | 'BLOCKED' } | null>(null);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   const fetchUsers = async () => {
     setIsLoading(true);
@@ -68,11 +71,38 @@ export default function AdminUsersPage() {
       fetchUsers();
       setIsDeleteModalOpen(false);
     } catch (error: unknown) {
+      console.error("Delete error:", error);
       const message = error instanceof Error ? error.message : "Failed to remove user";
       toast.error(message);
     } finally {
       setIsDeleting(false);
       setUserToDelete(null);
+    }
+  };
+
+  const handleToggleStatus = (id: number, currentStatus: string) => {
+    setStatusAction({ 
+      id, 
+      status: currentStatus === 'ACTIVE' ? 'BLOCKED' : 'ACTIVE' 
+    });
+    setIsStatusModalOpen(true);
+  };
+
+  const confirmStatusChange = async () => {
+    if (!statusAction) return;
+
+    setIsUpdatingStatus(true);
+    try {
+      await api.patch(`/auth/${statusAction.id}/status`, { status: statusAction.status });
+      toast.success(`User ${statusAction.status.toLowerCase()}ed successfully`);
+      fetchUsers();
+      setIsStatusModalOpen(false);
+    } catch (error: unknown) {
+      console.error("Status update error:", error);
+      toast.error("Failed to update user status");
+    } finally {
+      setIsUpdatingStatus(false);
+      setStatusAction(null);
     }
   };
 
@@ -174,15 +204,29 @@ export default function AdminUsersPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       {user.role !== "ADMIN" && (
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleDeleteUser(user.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <UserMinus className="h-4 w-4 mr-2" />
-                          Remove
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleToggleStatus(user.id, user.status)}
+                            className={user.status === 'ACTIVE' ? "text-orange-600 hover:text-orange-700 hover:bg-orange-50" : "text-green-600 hover:text-green-700 hover:bg-green-50"}
+                          >
+                            {user.status === 'ACTIVE' ? (
+                              <><Ban className="h-4 w-4 mr-2" /> Block</>
+                            ) : (
+                              <><CheckCircle className="h-4 w-4 mr-2" /> Unblock</>
+                            )}
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <UserMinus className="h-4 w-4 mr-2" />
+                            Remove
+                          </Button>
+                        </div>
                       )}
                     </TableCell>
                   </TableRow>
@@ -198,9 +242,22 @@ export default function AdminUsersPage() {
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={confirmDelete}
         title="Remove User Account"
-        description="Are you sure you want to remove this user? This action will permanently delete their account and history. This cannot be undone."
-        confirmText="Permanently Remove"
+        description="Are you sure you want to remove this user? This action will mark their account as deleted. This cannot be undone."
+        confirmText="Remove User"
         isLoading={isDeleting}
+      />
+
+      <ActionConfirmModal
+        isOpen={isStatusModalOpen}
+        onClose={() => setIsStatusModalOpen(false)}
+        onConfirm={confirmStatusChange}
+        title={statusAction?.status === 'BLOCKED' ? "Block User Account" : "Unblock User Account"}
+        description={statusAction?.status === 'BLOCKED' 
+          ? "Are you sure you want to block this user? They will not be able to log in to the system." 
+          : "Are you sure you want to unblock this user? They will regain access to the system."
+        }
+        confirmText={statusAction?.status === 'BLOCKED' ? "Block User" : "Unblock User"}
+        isLoading={isUpdatingStatus}
       />
     </div>
   );
