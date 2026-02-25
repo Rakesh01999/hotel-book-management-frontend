@@ -8,14 +8,51 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useBookingStore } from "@/store/useBookingStore";
 
-export default function RoomsPage() {
+function RoomsList() {
   const { t } = useTranslation();
   const { roomTypes, isLoading, fetchRoomTypes } = useRoomStore();
+  const searchParams = useSearchParams();
+  const checkInQuery = searchParams.get("checkIn");
+  const checkOutQuery = searchParams.get("checkOut");
+
+  const [availabilityData, setAvailabilityData] = React.useState<any[]>([]);
+  const [isCheckingAvailability, setIsCheckingAvailability] = React.useState(false);
 
   React.useEffect(() => {
     fetchRoomTypes();
   }, [fetchRoomTypes]);
+
+  React.useEffect(() => {
+    const fetchAvailability = async () => {
+      if (checkInQuery && checkOutQuery) {
+        setIsCheckingAvailability(true);
+        try {
+          const store = useBookingStore.getState();
+          const result = await store.checkAvailability(checkInQuery, checkOutQuery);
+          if (result.success && result.data) {
+            setAvailabilityData(result.data);
+          }
+        } catch (error) {
+          console.error("Failed to fetch availability", error);
+        } finally {
+          setIsCheckingAvailability(false);
+        }
+      } else {
+        setAvailabilityData([]);
+      }
+    };
+    fetchAvailability();
+  }, [checkInQuery, checkOutQuery]);
+
+  const queryParamsString = React.useMemo(() => {
+    const params = new URLSearchParams();
+    if (checkInQuery) params.append("checkIn", checkInQuery);
+    if (checkOutQuery) params.append("checkOut", checkOutQuery);
+    return params.toString();
+  }, [checkInQuery, checkOutQuery]);
 
   return (
     <div className="container py-12 space-y-10">
@@ -27,7 +64,7 @@ export default function RoomsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {isLoading ? (
+        {isLoading || isCheckingAvailability ? (
           Array.from({ length: 6 }).map((_, i) => (
             <Card key={i} className="overflow-hidden">
               <Skeleton className="h-64 w-full" />
@@ -41,8 +78,22 @@ export default function RoomsPage() {
             </Card>
           ))
         ) : roomTypes.length > 0 ? (
-          roomTypes.map((type) => (
-            <Card key={type.id} className="overflow-hidden hover:shadow-xl transition-all border-none shadow-lg bg-card group">
+          roomTypes.map((type) => {
+            let availableCount = type.rooms?.length || 0;
+            
+            // If dates are provided, override available count
+            if (checkInQuery && checkOutQuery && availabilityData.length > 0) {
+              const matchedAvo = availabilityData.find((r) => r.roomTypeId === type.id);
+              availableCount = matchedAvo ? matchedAvo.availableRooms : 0;
+            } else if (checkInQuery && checkOutQuery && availabilityData.length === 0) {
+              // Still fetching or errored / no rooms available
+              availableCount = 0;
+            }
+
+            const isSoldOut = checkInQuery && checkOutQuery ? availableCount === 0 : false;
+
+            return (
+            <Card key={type.id} className={`overflow-hidden hover:shadow-xl transition-all border-none shadow-lg bg-card group ${isSoldOut ? 'opacity-70 grayscale-[0.3]' : ''}`}>
               <div className="h-64 relative overflow-hidden">
                 <Image
                   src={type.images?.[0] || "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop"}
@@ -54,9 +105,14 @@ export default function RoomsPage() {
               <CardHeader>
                 <div className="flex justify-between items-start">
                   <div>
-                    <CardTitle className="text-xl">{type.name}</CardTitle>
-                    <CardDescription>
-                      {type.rooms?.length || 0} {type.rooms?.length === 1 ? "Room" : "Rooms"} Available
+                    <CardTitle className="text-xl flex items-center gap-2">
+                       {type.name}
+                       {isSoldOut && (
+                         <span className="text-xs ml-2 bg-destructive/10 text-destructive px-2 py-0.5 rounded-full font-bold uppercase tracking-widest shrink-0">Sold Out</span>
+                       )}
+                    </CardTitle>
+                    <CardDescription className={`${isSoldOut ? 'text-destructive font-semibold' : ''}`}>
+                      {availableCount} {availableCount === 1 ? "Room" : "Rooms"} Available
                     </CardDescription>
                   </div>
                   <div className="text-right">
@@ -81,12 +137,15 @@ export default function RoomsPage() {
                     </span>
                   )}
                 </div>
-                <Link href={`/rooms/${type.id}`}>
-                  <Button className="w-full">{t("rooms.viewDetail")}</Button>
+                <Link href={`/rooms/${type.id}${queryParamsString ? `?${queryParamsString}` : ''}`}>
+                  <Button className="w-full" variant={isSoldOut ? "destructive" : "default"}>
+                    {isSoldOut ? "View Waitlist" : t("rooms.viewDetail")}
+                  </Button>
                 </Link>
               </CardContent>
             </Card>
-          ))
+            );
+          })
         ) : (
           <div className="col-span-full text-center py-20 space-y-4">
             <h3 className="text-2xl font-semibold">No rooms found</h3>
@@ -95,5 +154,13 @@ export default function RoomsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function RoomsPage() {
+  return (
+    <React.Suspense fallback={<div className="container py-12 text-center text-muted-foreground animate-pulse">Loading rooms...</div>}>
+      <RoomsList />
+    </React.Suspense>
   );
 }

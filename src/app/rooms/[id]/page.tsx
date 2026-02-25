@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { useRoomStore } from "@/store/useRoomStore";
 import { useBookingStore } from "@/store/useBookingStore";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -30,9 +30,9 @@ import { Check, Star, Coffee, Wifi, Tv, MapPin, Users, Maximize, Calendar as Cal
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
-export default function RoomDetailsPage() {
+
+function RoomDetails() {
   const { id } = useParams();
   const router = useRouter();
   const { t } = useTranslation();
@@ -40,8 +40,13 @@ export default function RoomDetailsPage() {
   const { createBooking, isLoading: isBookingLoading } = useBookingStore();
   const { user, isAuthenticated } = useAuthStore();
   
+  const searchParams = useSearchParams();
+  const initialCheckIn = searchParams.get("checkIn") || "";
+  const initialCheckOut = searchParams.get("checkOut") || "";
+  const shouldOpenModal = !!(initialCheckIn && initialCheckOut);
+
   const [activeImage, setActiveImage] = React.useState(0);
-  const [isBookingModalOpen, setIsBookingModalOpen] = React.useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = React.useState(shouldOpenModal);
   const [availableRoomsCount, setAvailableRoomsCount] = React.useState<number | null>(null);
   const [isCheckingAvailability, setIsCheckingAvailability] = React.useState(false);
   const [bookedRoomIds, setBookedRoomIds] = React.useState<number[]>([]);
@@ -49,8 +54,8 @@ export default function RoomDetailsPage() {
   const [selectedRoomIds, setSelectedRoomIds] = React.useState<number[]>([]);
   
   // Booking Form State
-  const [checkIn, setCheckIn] = React.useState("");
-  const [checkOut, setCheckOut] = React.useState("");
+  const [checkIn, setCheckIn] = React.useState(initialCheckIn);
+  const [checkOut, setCheckOut] = React.useState(initialCheckOut);
   const [adults, setAdults] = React.useState("1");
   const [children, setChildren] = React.useState("0");
 
@@ -66,12 +71,14 @@ export default function RoomDetailsPage() {
       router.push("/login?redirect=" + (typeof window !== 'undefined' ? window.location.pathname : ''));
       return;
     }
-    // reset state
-    setCheckIn("");
-    setCheckOut("");
-    setAvailableRoomsCount(null);
-    setBookedRoomIds([]);
-    setSelectedRoomIds([]);
+    // Only reset state if the modal was closed and we are not auto-opening
+    if (!isBookingModalOpen && !shouldOpenModal) {
+      setCheckIn(initialCheckIn);
+      setCheckOut(initialCheckOut);
+      setAvailableRoomsCount(null);
+      setBookedRoomIds([]);
+      setSelectedRoomIds([]);
+    }
     setIsBookingModalOpen(true);
   };
 
@@ -532,5 +539,13 @@ export default function RoomDetailsPage() {
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+export default function RoomDetailsPage() {
+  return (
+    <React.Suspense fallback={<div className="container py-12 text-center text-muted-foreground animate-pulse">Loading room details...</div>}>
+      <RoomDetails />
+    </React.Suspense>
   );
 }

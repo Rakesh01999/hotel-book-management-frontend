@@ -8,13 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Card,
   CardContent,
   CardDescription,
@@ -40,7 +33,6 @@ export default function Home() {
   // Search state
   const [checkIn, setCheckIn] = React.useState("");
   const [checkOut, setCheckOut] = React.useState("");
-  const [guests, setGuests] = React.useState("");
   
   // Cast t to any or specific type to access faq if needed, 
   // but usually useTranslation returns a proxy or a broad object.
@@ -55,7 +47,6 @@ export default function Home() {
     const params = new URLSearchParams();
     if (checkIn) params.append("checkIn", checkIn);
     if (checkOut) params.append("checkOut", checkOut);
-    if (guests) params.append("guests", guests);
     
     const queryString = params.toString();
     router.push(queryString ? `/rooms?${queryString}` : "/rooms");
@@ -81,7 +72,7 @@ export default function Home() {
           
           <Card className="max-w-4xl mx-auto mt-8 bg-white/10 backdrop-blur-md border-white/20 text-left">
             <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label className="text-white">Check In</Label>
                   <Input 
@@ -99,19 +90,6 @@ export default function Home() {
                     onChange={(e) => setCheckOut(e.target.value)}
                     className="bg-transparent border-white/50 focus-visible:ring-white text-white placeholder:text-gray-400" 
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-white">Guests</Label>
-                  <Select value={guests} onValueChange={setGuests}>
-                    <SelectTrigger className="bg-transparent border-white/50 focus:ring-white text-white">
-                      <SelectValue placeholder="Select guests" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 Adult, 0 Children</SelectItem>
-                      <SelectItem value="2">2 Adults, 0 Children</SelectItem>
-                      <SelectItem value="3">2 Adults, 1 Child</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
                 <div className="flex items-end">
                   <Button 
