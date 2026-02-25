@@ -19,6 +19,7 @@ import api from "@/lib/axios";
 import { toast } from "sonner";
 import { User } from "@/types/auth"; // Central type
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ActionConfirmModal } from "@/components/modals/ActionConfirmModal";
 
 
 /* Removed local User interface */
@@ -28,6 +29,9 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchUsers = async () => {
     setIsLoading(true);
@@ -49,16 +53,26 @@ export default function AdminUsersPage() {
     fetchUsers();
   }, []);
 
-  const handleDeleteUser = async (id: number) => {
-    if (!confirm("Are you sure you want to remove this user? This action cannot be undone.")) return;
-    
+  const handleDeleteUser = (id: number) => {
+    setUserToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!userToDelete) return;
+
+    setIsDeleting(true);
     try {
-      await api.delete(`/auth/${id}`);
+      await api.delete(`/auth/${userToDelete}`);
       toast.success("User removed successfully");
       fetchUsers();
+      setIsDeleteModalOpen(false);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Failed to remove user";
       toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setUserToDelete(null);
     }
   };
 
@@ -178,6 +192,16 @@ export default function AdminUsersPage() {
           </Table>
         </CardContent>
       </Card>
+
+      <ActionConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="Remove User Account"
+        description="Are you sure you want to remove this user? This action will permanently delete their account and history. This cannot be undone."
+        confirmText="Permanently Remove"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

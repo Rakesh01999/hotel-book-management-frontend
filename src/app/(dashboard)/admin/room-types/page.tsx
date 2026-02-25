@@ -35,6 +35,7 @@ import { Textarea } from "@/components/ui/textarea";
 import api from "@/lib/axios";
 import { toast } from "sonner";
 import { RoomType } from "@/types/room"; // Central type
+import { ActionConfirmModal } from "@/components/modals/ActionConfirmModal";
 
 
 /* Removed local RoomCategory interface */
@@ -47,6 +48,9 @@ export default function RoomCategoriesPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingCategory, setEditingCategory] = useState<RoomType | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
 
   // Form states
@@ -95,16 +99,26 @@ export default function RoomCategoriesPage() {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure? This will delete all rooms associated with this category.")) return;
+  const handleDelete = (id: number) => {
+    setCategoryToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!categoryToDelete) return;
     
+    setIsDeleting(true);
     try {
-      await api.delete(`/roomCategory/${id}`);
+      await api.delete(`/roomCategory/${categoryToDelete}`);
       toast.success("Category deleted");
       fetchCategories();
+      setIsDeleteModalOpen(false);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Failed to delete category";
       toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setCategoryToDelete(null);
     }
   };
 
@@ -323,6 +337,16 @@ export default function RoomCategoriesPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <ActionConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="Delete Category"
+        description="Are you sure? This will delete all rooms associated with this category. This action is irreversible."
+        confirmText="Delete Category"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

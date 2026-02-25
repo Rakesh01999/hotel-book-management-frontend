@@ -19,6 +19,7 @@ import { Search, XCircle, AlertCircle } from "lucide-react";
 import api from "@/lib/axios";
 import { toast } from "sonner";
 import { Booking } from "@/types/booking"; // Central type
+import { ActionConfirmModal } from "@/components/modals/ActionConfirmModal";
 
 
 /* Removed local Booking interface */
@@ -29,6 +30,8 @@ export default function AdminBookingsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isCancelling, setIsCancelling] = useState<number | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState<number | null>(null);
 
   const fetchBookings = async (search?: string) => {
     setIsLoading(true);
@@ -59,20 +62,27 @@ export default function AdminBookingsPage() {
     fetchBookings();
   };
 
-  const handleCancelBooking = async (id: number) => {
-    if (!confirm("Are you sure you want to cancel this booking?")) return;
+  const handleCancelBooking = (id: number) => {
+    setSelectedBookingId(id);
+    setIsModalOpen(true);
+  };
+
+  const confirmCancel = async () => {
+    if (!selectedBookingId) return;
     
-    setIsCancelling(id);
+    setIsCancelling(selectedBookingId);
     try {
-      await api.patch(`/book/cancel/${id}`);
+      await api.patch(`/book/cancel/${selectedBookingId}`);
       toast.success("Booking cancelled successfully");
       fetchBookings(searchTerm); // Refresh the list
+      setIsModalOpen(false);
     } catch (error: unknown) {
       console.error("Failed to cancel booking:", error);
       const message = error instanceof Error ? error.message : "Failed to cancel booking";
       toast.error(message);
     } finally {
       setIsCancelling(null);
+      setSelectedBookingId(null);
     }
   };
 
@@ -215,6 +225,16 @@ export default function AdminBookingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <ActionConfirmModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={confirmCancel}
+        title="Cancel Booking"
+        description="Are you sure you want to cancel this booking? This action will notify the guest and cannot be undone."
+        confirmText="Yes, Cancel Booking"
+        isLoading={isCancelling !== null}
+      />
     </div>
   );
 }

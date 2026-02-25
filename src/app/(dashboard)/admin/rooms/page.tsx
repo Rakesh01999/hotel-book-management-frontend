@@ -40,6 +40,7 @@ import {
 import api from "@/lib/axios";
 import { toast } from "sonner";
 import { Room, RoomType } from "@/types/room"; // Central types
+import { ActionConfirmModal } from "@/components/modals/ActionConfirmModal";
 
 
 /* Removed local Room and RoomType interfaces */
@@ -53,6 +54,9 @@ export default function AdminRoomsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [roomToDelete, setRoomToDelete] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Form states
   const [formData, setFormData] = useState({
@@ -97,16 +101,26 @@ export default function AdminRoomsPage() {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this room?")) return;
+  const handleDelete = (id: number) => {
+    setRoomToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!roomToDelete) return;
     
+    setIsDeleting(true);
     try {
-      await api.delete(`/room/${id}`);
+      await api.delete(`/room/${roomToDelete}`);
       toast.success("Room deleted");
       fetchData();
+      setIsDeleteModalOpen(false);
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Failed to delete room";
       toast.error(message);
+    } finally {
+      setIsDeleting(false);
+      setRoomToDelete(null);
     }
   };
 
@@ -280,6 +294,16 @@ export default function AdminRoomsPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      <ActionConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDelete}
+        title="Remove Physical Room"
+        description="Are you sure you want to remove this physical room from inventory? This action cannot be undone."
+        confirmText="Remove Room"
+        isLoading={isDeleting}
+      />
     </div>
   );
 }
