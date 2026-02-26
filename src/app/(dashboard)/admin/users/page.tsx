@@ -29,6 +29,11 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const limit = 10;
+  
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -36,13 +41,21 @@ export default function AdminUsersPage() {
   const [statusAction, setStatusAction] = useState<{ id: number, status: 'ACTIVE' | 'BLOCKED' } | null>(null);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (page: number = currentPage, search: string = searchTerm) => {
     setIsLoading(true);
     try {
-      const response = await api.get("/auth");
-      // The backend returns a list of users directly in data or data.data
-      const userData = response.data?.data || [];
-      setUsers(Array.isArray(userData) ? userData : []);
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
+      if (search) params.append('searchTerm', search);
+
+      const response = await api.get(`/auth?${params.toString()}`);
+      const responseData = response.data?.data;
+      
+      const userList = responseData?.data || [];
+      setUsers(Array.isArray(userList) ? userList : []);
+      setTotalPages(responseData?.meta?.total ? Math.ceil(responseData.meta.total / limit) : 1);
+      setTotalItems(responseData?.meta?.total || 0);
     } catch (error: unknown) {
       console.error("Failed to fetch users:", error);
       const message = error instanceof Error ? error.message : "Failed to load users";
@@ -106,10 +119,12 @@ export default function AdminUsersPage() {
     }
   };
 
-  const filteredUsers = users.filter(u => 
-    u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setCurrentPage(1);
+    fetchUsers(1, value);
+  };
 
   return (
     <div className="space-y-6">
@@ -127,7 +142,7 @@ export default function AdminUsersPage() {
               placeholder="Search by name or email..."
               className="pl-8 bg-background"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
             />
           </div>
         </CardHeader>
@@ -161,14 +176,14 @@ export default function AdminUsersPage() {
                     <TableCell><Skeleton className="h-8 w-24 ml-auto" /></TableCell>
                   </TableRow>
                 ))
-              ) : filteredUsers.length === 0 ? (
+              ) : users.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                     No users found matching your search.
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredUsers.map((user) => (
+                users.map((user) => (
                   <TableRow key={user.id} className="hover:bg-muted/20">
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -234,6 +249,41 @@ export default function AdminUsersPage() {
               )}
             </TableBody>
           </Table>
+          
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-6 border-t bg-muted/10">
+            <div className="text-sm text-muted-foreground">
+              Showing <span className="font-medium">{users.length}</span> of <span className="font-medium">{totalItems}</span> users
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground mr-2">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const newPage = currentPage - 1;
+                  setCurrentPage(newPage);
+                  fetchUsers(newPage);
+                }}
+                disabled={currentPage <= 1 || isLoading}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const newPage = currentPage + 1;
+                  setCurrentPage(newPage);
+                  fetchUsers(newPage);
+                }}
+                disabled={currentPage >= totalPages || isLoading}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
 

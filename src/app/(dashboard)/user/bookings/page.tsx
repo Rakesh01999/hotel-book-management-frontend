@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useBookingStore } from "@/store/useBookingStore";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -15,36 +15,38 @@ import {
   ArrowRight, 
   ChevronRight,
   Search,
-  Filter,
   PackageOpen,
   CreditCard,
   CheckCircle2,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Sparkles,
+  Receipt
 } from "lucide-react";
 import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 const StatusBadge = ({ status }: { status: string }) => {
   const statusStyles = {
-    CONFIRMED: "bg-emerald-500/10 text-emerald-600 border-emerald-200",
-    PENDING_PAYMENT: "bg-amber-500/10 text-amber-600 border-amber-200",
-    CANCELLED: "bg-destructive/10 text-destructive border-destructive/20",
+    CONFIRMED: "bg-emerald-500/10 text-emerald-600 border-emerald-200/50 shadow-[0_0_10px_rgba(16,185,129,0.1)]",
+    PENDING_PAYMENT: "bg-amber-500/10 text-amber-600 border-amber-200/50 shadow-[0_0_10px_rgba(245,158,11,0.1)]",
+    CANCELLED: "bg-destructive/10 text-destructive border-destructive/20 shadow-[0_0_10px_rgba(239,68,68,0.05)]",
   };
 
   const statusIcons = {
-    CONFIRMED: <CheckCircle2 className="h-3 w-3 mr-1" />,
-    PENDING_PAYMENT: <Clock className="h-3 w-3 mr-1" />,
-    CANCELLED: <XCircle className="h-3 w-3 mr-1" />,
+    CONFIRMED: <CheckCircle2 className="h-3 w-3 mr-1.5" />,
+    PENDING_PAYMENT: <Clock className="h-3 w-3 mr-1.5" />,
+    CANCELLED: <XCircle className="h-3 w-3 mr-1.5" />,
   };
 
   const style = statusStyles[status as keyof typeof statusStyles] || "bg-muted text-muted-foreground";
-  const icon = statusIcons[status as keyof typeof statusIcons] || <AlertCircle className="h-3 w-3 mr-1" />;
+  const icon = statusIcons[status as keyof typeof statusIcons] || <AlertCircle className="h-3 w-3 mr-1.5" />;
 
   return (
-    <Badge variant="outline" className={`${style} flex items-center py-1`}>
+    <Badge variant="outline" className={cn("flex items-center backdrop-blur-md px-3 py-1 text-[10px] font-bold tracking-wider uppercase border", style)}>
       {icon}
       {status.replace("_", " ")}
     </Badge>
@@ -71,176 +73,188 @@ export default function MyBookingsPage() {
   }) || [];
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight">My Bookings</h1>
-          <p className="text-muted-foreground">Manage your stay reservations and payment status.</p>
+    <div className="max-w-6xl mx-auto px-4 pb-20 space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-1000">
+      {/* Hero Header */}
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/5 via-background to-primary/10 border border-primary/10 p-8 md:p-12">
+        <div className="absolute top-0 right-0 -uht-20 -uh-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 -uht-20 -uh-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl opacity-50" />
+        
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="space-y-4 text-center md:text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest">
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>Exclusive Access</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+              My Collections
+            </h1>
+            <p className="text-muted-foreground text-lg max-w-md leading-relaxed">
+              Your curated list of premium stays and upcoming luxury experiences.
+            </p>
+          </div>
+          <Link href="/rooms">
+            <Button size="lg" className="h-14 px-8 text-md font-bold rounded-2xl shadow-2xl shadow-primary/30 hover:scale-105 transition-all group">
+              Plan New Escape
+              <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+            </Button>
+          </Link>
         </div>
-        <Link href="/rooms">
-          <Button className="shadow-lg shadow-primary/20">
-            Book New Stay
-          </Button>
-        </Link>
+      </section>
+
+      {/* Filter Bar */}
+      <div className="sticky top-4 z-30">
+        <Card className="backdrop-blur-xl bg-background/80 border-primary/10 shadow-2xl shadow-black/5 rounded-2xl overflow-hidden">
+          <CardContent className="p-3 flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
+            <div className="relative flex-1 group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <Input 
+                placeholder="Search stays..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="h-12 pl-12 bg-transparent border-none focus-visible:ring-0 text-md placeholder:text-muted-foreground/50"
+              />
+            </div>
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+              {["ALL", "CONFIRMED", "PENDING_PAYMENT", "CANCELLED"].map(filter => (
+                <Button
+                  key={filter}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setActiveFilter(filter)}
+                  className={cn(
+                    "h-10 px-5 rounded-xl text-sm font-semibold transition-all shrink-0",
+                    activeFilter === filter 
+                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary" 
+                      : "hover:bg-primary/5 text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {filter === "ALL" ? "Everything" : filter.replace("_", " ")}
+                </Button>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      <Card className="border-none shadow-sm bg-muted/30">
-        <CardContent className="p-4 flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search by Booking ID or Room Type..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-background"
-            />
-          </div>
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
-            {["ALL", "CONFIRMED", "PENDING_PAYMENT", "CANCELLED"].map(filter => (
-              <Button
-                key={filter}
-                variant={activeFilter === filter ? "default" : "outline"}
-                size="sm"
-                onClick={() => setActiveFilter(filter)}
-                className="whitespace-nowrap transition-all"
-              >
-                {filter === "ALL" ? "All Bookings" : filter.replace("_", " ")}
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-6">
-          {[1, 2, 3].map(i => (
-            <Card key={i} className="overflow-hidden border-none shadow-sm h-48 animate-pulse">
-              <div className="flex flex-col md:flex-row h-full">
-                <div className="w-full md:w-64 bg-muted h-32 md:h-full" />
-                <div className="flex-1 p-6 space-y-4">
-                  <div className="h-6 w-1/3 bg-muted rounded" />
-                  <div className="h-4 w-2/3 bg-muted rounded" />
-                  <div className="h-8 w-1/4 bg-muted rounded" />
-                </div>
+        <div className="grid grid-cols-1 gap-8">
+          {[1, 2].map(i => (
+            <div key={i} className="flex flex-col md:flex-row gap-6 p-4 rounded-3xl border border-muted animate-pulse">
+              <div className="w-full md:w-80 h-56 bg-muted rounded-2xl" />
+              <div className="flex-1 space-y-6 py-4">
+                <div className="h-8 w-1/3 bg-muted rounded-lg" />
+                <div className="h-24 w-full bg-muted/50 rounded-lg" />
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       ) : filteredBookings.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-10">
           {filteredBookings.map((booking) => (
-            <Card key={booking.id} className="overflow-hidden border-none shadow-sm hover:shadow-md transition-all group">
-              <div className="flex flex-col md:flex-row">
-                <div className="relative w-full md:w-64 h-48 md:h-auto overflow-hidden">
-                  <Image
-                    src={booking.rooms?.[0]?.room?.roomType?.images?.[0] || "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop"}
-                    alt="Room Image"
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <StatusBadge status={booking.status} />
-                  </div>
-                </div>
-                <div className="flex-1 p-6 flex flex-col justify-between">
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-start">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2 text-primary font-semibold text-sm uppercase tracking-wider">
-                          <PackageOpen className="h-4 w-4" />
-                          <span>Luxury Stay</span>
-                        </div>
-                        <h3 className="text-2xl font-bold tracking-tight">
-                          {booking.rooms?.[0]?.room?.roomType?.name || "Premium Suite"}
-                        </h3>
-                        <p className="text-muted-foreground text-sm flex items-center gap-1 font-mono">
-                          #BK-{booking.id.toString().padStart(6, '0')}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-black text-primary">${booking.totalAmount}</p>
-                        <p className="text-xs text-muted-foreground">Total inclusive tax</p>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-4 border-y border-dashed">
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Check In</span>
-                        <div className="flex items-center gap-2 font-medium text-sm">
-                          <Calendar className="h-3.5 w-3.5 text-primary" />
-                          {format(new Date(booking.checkIn), "MMM dd, yyyy")}
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Check Out</span>
-                        <div className="flex items-center gap-2 font-medium text-sm">
-                          <Calendar className="h-3.5 w-3.5 text-primary" />
-                          {format(new Date(booking.checkOut), "MMM dd, yyyy")}
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Guests</span>
-                        <div className="flex items-center gap-2 font-medium text-sm">
-                          <Users className="h-3.5 w-3.5 text-primary" />
-                          {booking.adults} Adults, {booking.children} Child
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">Payment</span>
-                        <div className="flex items-center gap-2 font-medium text-sm">
-                          <CreditCard className="h-3.5 w-3.5 text-primary" />
-                          {booking.status === 'CONFIRMED' ? "Paid" : "Pending"}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between mt-6">
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <MapPin className="h-3 w-3" />
-                      <span>Antigravity Luxury Hotel & Spa</span>
-                    </div>
-                    {booking.status === 'PENDING_PAYMENT' && (
-                       <Button size="sm" className="gap-2 bg-amber-500 hover:bg-amber-600 text-white border-none">
-                         Complete Payment
-                         <ArrowRight className="h-4 w-4" />
-                       </Button>
-                    )}
-                    <Button variant="ghost" size="sm" className="text-primary hover:bg-primary/5 hover:text-primary group/btn">
-                      View Details
-                      <ChevronRight className="h-4 w-4 ml-1 group-hover/btn:translate-x-1 transition-transform" />
-                    </Button>
-                  </div>
+            <div key={booking.id} className="group relative flex flex-col md:flex-row bg-card border border-primary/5 rounded-[2.5rem] overflow-hidden hover:shadow-2xl hover:shadow-primary/5 hover:border-primary/10 transition-all duration-700">
+              {/* Image Section */}
+              <div className="relative w-full md:w-[26rem] h-64 md:h-auto overflow-hidden">
+                <Image
+                  src={booking.rooms?.[0]?.room?.roomType?.images?.[0] || "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop"}
+                  alt="Room Image"
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent md:hidden" />
+                <div className="absolute top-6 left-6 z-10 scale-110">
+                  <StatusBadge status={booking.status} />
                 </div>
               </div>
-            </Card>
+
+              {/* Content Section */}
+              <div className="flex-1 p-8 md:p-10 flex flex-col justify-between">
+                <div>
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
+                    <div className="space-y-2">
+                       <div className="flex items-center gap-2 text-primary/80">
+                         <MapPin className="h-4 w-4" />
+                         <span className="text-[11px] font-black uppercase tracking-[0.2em]">Luxury Oasis • Hotel Mobarauk Al Madinah</span>
+                       </div>
+                       <h3 className="text-3xl font-black tracking-tight leading-tight group-hover:text-primary transition-colors duration-500">
+                        {booking.rooms?.[0]?.room?.roomType?.name || "Premium Sanctuary"}
+                       </h3>
+                       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted/50 text-muted-foreground font-mono text-xs">
+                         <Receipt className="h-3 w-3" />
+                         BK-{booking.id.toString().padStart(6, '0')}
+                       </div>
+                    </div>
+                    <div className="text-left sm:text-right">
+                      <div className="text-3xl font-black tracking-tight text-primary flex items-baseline gap-1">
+                        <span className="text-lg opacity-50">$</span>
+                        {booking.totalAmount}
+                      </div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-1">Confirmed Rate</p>
+                    </div>
+                  </div>
+
+                  {/* Grid Stats */}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 p-6 rounded-3xl bg-muted/30 border border-primary/5 group-hover:bg-primary/[0.02] transition-colors">
+                    {[
+                      { icon: Calendar, label: "Check In", value: format(new Date(booking.checkIn), "MMM dd, yyyy") },
+                      { icon: Calendar, label: "Check Out", value: format(new Date(booking.checkOut), "MMM dd, yyyy") },
+                      { icon: Users, label: "Stay Party", value: `${booking.adults} Adults, ${booking.children} Child` },
+                      { icon: CreditCard, label: "Payment", value: booking.status === 'CONFIRMED' ? "Settled" : "Pending" }
+                    ].map((stat, idx) => (
+                      <div key={idx} className="space-y-1.5">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/70">{stat.label}</span>
+                        <div className="flex items-center gap-2 font-bold text-sm">
+                          <stat.icon className="h-4 w-4 text-primary/60 shrink-0" />
+                          <span className="truncate">{stat.value}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mt-8 pt-4">
+                   <div className="flex items-center gap-3">
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                      <span className="text-xs font-semibold text-muted-foreground">Ready for your visit</span>
+                   </div>
+                   <div className="flex items-center gap-3">
+                    {booking.status === 'PENDING_PAYMENT' && (
+                       <Button className="h-12 px-6 bg-primary text-primary-foreground font-bold rounded-xl shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+                         Settle Dues
+                         <CreditCard className="h-4 w-4 ml-2" />
+                       </Button>
+                    )}
+                    <Button variant="outline" className="h-12 px-6 rounded-xl border-primary/10 hover:bg-primary/5 hover:border-primary/20 font-bold transition-all group/btn">
+                      Dashboard View
+                      <ChevronRight className="h-4 w-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                    </Button>
+                   </div>
+                </div>
+              </div>
+            </div>
           ))}
         </div>
       ) : (
-        <Card className="border-dashed border-2 bg-transparent">
-          <CardContent className="flex flex-col items-center justify-center py-20 text-center space-y-6">
-            <div className="h-24 w-24 rounded-full bg-muted/50 flex items-center justify-center">
-              <PackageOpen className="h-12 w-12 text-muted-foreground/50" />
+        <Card className="border-2 border-dashed border-primary/10 bg-transparent rounded-[2.5rem] py-24">
+          <CardContent className="flex flex-col items-center justify-center text-center space-y-8">
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary/20 blur-[50px] rounded-full" />
+              <div className="relative h-32 w-32 rounded-[2rem] bg-gradient-to-br from-primary/10 to-transparent flex items-center justify-center border border-primary/10">
+                <PackageOpen className="h-16 w-16 text-primary/40" />
+              </div>
             </div>
-            <div className="space-y-2">
-              <h3 className="text-2xl font-bold">No bookings found</h3>
-              <p className="text-muted-foreground max-w-sm">
+            <div className="space-y-3 px-6">
+              <h3 className="text-3xl font-black tracking-tight italic">Silent Horizon</h3>
+              <p className="text-muted-foreground max-w-md text-lg leading-relaxed">
                 {searchTerm || activeFilter !== "ALL" 
-                  ? "We couldn't find any bookings matching your current filters. Try adjusting your search."
-                  : "You haven't made any reservations yet. Start planning your luxury getaway today!"}
+                  ? "We couldn't find any journeys matching your current lens. Try expanding your search."
+                  : "No stories written yet. Where will your next chapter take you?"}
               </p>
             </div>
-            {(searchTerm || activeFilter !== "ALL") ? (
-              <Button variant="outline" onClick={() => { setSearchTerm(""); setActiveFilter("ALL"); }}>
-                Clear All Filters
+            <Link href="/rooms">
+              <Button size="lg" className="h-14 px-10 rounded-2xl font-black uppercase tracking-widest shadow-2xl shadow-primary/20">
+                Begin Exploration
               </Button>
-            ) : (
-              <Link href="/rooms">
-                <Button className="h-12 px-8 text-lg font-semibold shadow-xl shadow-primary/20">
-                  Explore Luxury Rooms
-                </Button>
-              </Link>
-            )}
+            </Link>
           </CardContent>
         </Card>
       )}

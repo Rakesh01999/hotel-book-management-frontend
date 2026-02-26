@@ -34,16 +34,20 @@ export default function AdminBookingsPage() {
   const [searchCheckIn, setSearchCheckIn] = useState("");
   const [searchCheckOut, setSearchCheckOut] = useState("");
   const [searchTerm, setSearchTerm] = useState(""); // Kept for general or ID search if needed
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const limit = 10;
   const [isCancelling, setIsCancelling] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState<number | null>(null);
 
-  const fetchBookings = async () => {
+  const fetchBookings = async (page: number = currentPage) => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
-      params.append('page', '1');
-      params.append('limit', '100');
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
       if (searchName) params.append('name', searchName);
       if (searchEmail) params.append('email', searchEmail);
       if (searchDate) params.append('date', searchDate);
@@ -52,7 +56,10 @@ export default function AdminBookingsPage() {
       if (searchTerm) params.append('searchTerm', searchTerm);
 
       const response = await api.get(`/book?${params.toString()}`);
-      setBookings(response.data?.data?.data || []);
+      const responseData = response.data?.data;
+      setBookings(responseData?.data || []);
+      setTotalPages(Math.ceil((responseData?.meta?.total || 0) / limit));
+      setTotalItems(responseData?.meta?.total || 0);
     } catch (error: unknown) {
       console.error("Failed to fetch bookings:", error);
       const message = error instanceof Error ? error.message : "Failed to load bookings";
@@ -63,12 +70,13 @@ export default function AdminBookingsPage() {
   };
 
   useEffect(() => {
-    fetchBookings();
+    fetchBookings(1);
   }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchBookings();
+    setCurrentPage(1);
+    fetchBookings(1);
   };
 
   const clearSearch = () => {
@@ -78,10 +86,13 @@ export default function AdminBookingsPage() {
     setSearchCheckIn("");
     setSearchCheckOut("");
     setSearchTerm("");
-    // We need to wait for state updates or pass empty values directly
+    setCurrentPage(1);
     setIsLoading(true);
-    api.get('/book?page=1&limit=100').then((response) => {
-      setBookings(response.data?.data?.data || []);
+    api.get(`/book?page=1&limit=${limit}`).then((response) => {
+      const responseData = response.data?.data;
+      setBookings(responseData?.data || []);
+      setTotalPages(Math.ceil((responseData?.meta?.total || 0) / limit));
+      setTotalItems(responseData?.meta?.total || 0);
       setIsLoading(false);
     });
   };
@@ -289,6 +300,41 @@ export default function AdminBookingsPage() {
                 )}
               </TableBody>
             </Table>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-6 border-t bg-muted/10">
+            <div className="text-sm text-muted-foreground">
+              Showing <span className="font-medium">{bookings.length}</span> of <span className="font-medium">{totalItems}</span> bookings
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground mr-2">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const newPage = currentPage - 1;
+                  setCurrentPage(newPage);
+                  fetchBookings(newPage);
+                }}
+                disabled={currentPage <= 1 || isLoading}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  const newPage = currentPage + 1;
+                  setCurrentPage(newPage);
+                  fetchBookings(newPage);
+                }}
+                disabled={currentPage >= totalPages || isLoading}
+              >
+                Next
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
