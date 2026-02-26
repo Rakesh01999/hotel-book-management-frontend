@@ -47,7 +47,7 @@ const DashboardSidebar = () => {
   return (
     <div 
       className={cn(
-        "relative flex flex-col h-[calc(100vh-4rem)] border-r bg-card transition-all duration-300 ease-in-out",
+        "relative hidden md:flex flex-col h-[calc(100vh-4rem)] border-r bg-card transition-all duration-300 ease-in-out",
         collapsed ? "w-16" : "w-64"
       )}
     >
@@ -60,13 +60,13 @@ const DashboardSidebar = () => {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors group",
+                  "flex items-center gap-4 px-3 py-3 rounded-lg text-base font-medium transition-colors group",
                   isActive 
                     ? "bg-primary text-primary-foreground shadow-sm" 
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
-                <item.icon className={cn("h-4 w-4 shrink-0", isActive ? "" : "group-hover:scale-110 transition-transform")} />
+                <item.icon className={cn("h-5 w-5 shrink-0", isActive ? "" : "group-hover:scale-110 transition-transform")} />
                 {!collapsed && <span>{item.name}</span>}
               </Link>
             );
@@ -77,14 +77,14 @@ const DashboardSidebar = () => {
       <div className="p-4 border-t">
         <Button
           variant="ghost"
-          size="sm"
+          size="lg"
           className={cn(
-            "w-full flex items-center gap-3 px-3 py-2 text-destructive hover:bg-destructive/10 hover:text-destructive",
+            "w-full flex items-center gap-4 px-3 py-3 text-base text-destructive hover:bg-destructive/10 hover:text-destructive",
             collapsed ? "justify-center" : "justify-start"
           )}
           onClick={handleLogout}
         >
-          <LogOut className="h-4 w-4 shrink-0" />
+          <LogOut className="h-5 w-5 shrink-0" />
           {!collapsed && <span>Logout</span>}
         </Button>
       </div>

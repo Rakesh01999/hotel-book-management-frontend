@@ -49,7 +49,7 @@ const AdminSidebar = () => {
   return (
     <div 
       className={cn(
-        "relative flex flex-col h-[calc(100vh-4rem)] border-r bg-slate-900 text-slate-100 transition-all duration-300 ease-in-out z-10",
+        "relative hidden md:flex flex-col h-[calc(100vh-4rem)] border-r bg-slate-900 text-slate-100 transition-all duration-300 ease-in-out z-10",
         collapsed ? "w-16" : "w-64"
       )}
     >
@@ -62,13 +62,13 @@ const AdminSidebar = () => {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors group",
+                  "flex items-center gap-4 px-3 py-3 rounded-lg text-base font-medium transition-colors group",
                   isActive 
                     ? "bg-primary text-primary-foreground shadow-sm" 
                     : "text-slate-400 hover:bg-slate-800 hover:text-white"
                 )}
               >
-                <item.icon className={cn("h-4 w-4 shrink-0", !isActive && "group-hover:scale-110 transition-transform")} />
+                <item.icon className={cn("h-5 w-5 shrink-0", !isActive && "group-hover:scale-110 transition-transform")} />
                 {!collapsed && <span>{item.name}</span>}
               </Link>
             );
@@ -79,14 +79,14 @@ const AdminSidebar = () => {
       <div className="p-4 border-t border-slate-800">
         <Button
           variant="ghost"
-          size="sm"
+          size="lg"
           className={cn(
-            "w-full flex items-center gap-3 px-3 py-2 text-red-400 hover:bg-red-950 hover:text-red-300",
+            "w-full flex items-center gap-4 px-3 py-3 text-base text-red-400 hover:bg-red-950 hover:text-red-300",
             collapsed ? "justify-center" : "justify-start"
           )}
           onClick={handleLogout}
         >
-          <LogOut className="h-4 w-4 shrink-0" />
+          <LogOut className="h-5 w-5 shrink-0" />
           {!collapsed && <span>Logout</span>}
         </Button>
       </div>
