@@ -49,7 +49,8 @@ const AdminSidebar = () => {
   return (
     <div 
       className={cn(
-        "relative hidden md:flex flex-col h-[calc(100vh-4rem)] border-r bg-slate-900 text-slate-100 transition-all duration-300 ease-in-out z-10",
+        "relative hidden md:flex flex-col h-[calc(100vh-4rem)] border-r transition-all duration-300 ease-in-out z-10",
+        "dark:bg-slate-900 dark:text-slate-100 bg-white text-slate-900",
         collapsed ? "w-16" : "w-64"
       )}
     >
@@ -65,7 +66,7 @@ const AdminSidebar = () => {
                   "flex items-center gap-4 px-3 py-3 rounded-lg text-base font-medium transition-colors group",
                   isActive 
                     ? "bg-primary text-primary-foreground shadow-sm" 
-                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                    : "dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                 )}
               >
                 <item.icon className={cn("h-5 w-5 shrink-0", !isActive && "group-hover:scale-110 transition-transform")} />
@@ -76,12 +77,12 @@ const AdminSidebar = () => {
         </nav>
       </div>
 
-      <div className="p-4 border-t border-slate-800">
+      <div className="p-4 border-t dark:border-slate-800 border-slate-200">
         <Button
           variant="ghost"
           size="lg"
           className={cn(
-            "w-full flex items-center gap-4 px-3 py-3 text-base text-red-400 hover:bg-red-950 hover:text-red-300",
+            "w-full flex items-center gap-4 px-3 py-3 text-base text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300 hover:bg-red-50 hover:text-red-600",
             collapsed ? "justify-center" : "justify-start"
           )}
           onClick={handleLogout}
@@ -93,7 +94,7 @@ const AdminSidebar = () => {
 
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full border border-slate-700 bg-slate-800 text-slate-300 flex items-center justify-center hover:bg-slate-700 transition-colors shadow-sm"
+        className="absolute -right-3 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-200 bg-white text-slate-600 flex items-center justify-center hover:bg-slate-50 transition-colors shadow-sm"
       >
         {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronLeft className="h-3 w-3" />}
       </button>

@@ -57,14 +57,34 @@ const DashboardMobileNav = ({ navItems, title = "Menu", role = "USER" }: Dashboa
               <span className="sr-only">Toggle Menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className={cn("w-72 p-0", role === "ADMIN" ? "bg-slate-900" : "bg-card")}>
-            <SheetHeader className={cn("p-6 border-b", role === "ADMIN" ? "bg-slate-900 border-slate-800" : "bg-card")}>
-              <SheetTitle className={cn("flex items-center gap-3 text-lg font-bold", role === "ADMIN" ? "text-white" : "text-foreground")}>
+          <SheetContent side="left" className={cn(
+            "w-72 p-0", 
+            role === "ADMIN" 
+              ? "dark:bg-slate-900 bg-white" 
+              : "bg-card"
+          )}>
+            <SheetHeader className={cn(
+              "p-6 border-b", 
+              role === "ADMIN" 
+                ? "dark:bg-slate-900 dark:border-slate-800 bg-white border-slate-100" 
+                : "bg-card"
+            )}>
+              <SheetTitle className={cn(
+                "flex items-center gap-3 text-lg font-bold", 
+                role === "ADMIN" 
+                  ? "dark:text-white text-slate-900" 
+                  : "text-foreground"
+              )}>
                 <LayoutDashboard className="h-6 w-6" />
                 {role === "ADMIN" ? "Admin Panel" : "Dashboard"}
               </SheetTitle>
             </SheetHeader>
-            <div className={cn("flex flex-col h-full", role === "ADMIN" ? "bg-slate-900 text-slate-100" : "bg-card text-foreground")}>
+            <div className={cn(
+              "flex flex-col h-full", 
+              role === "ADMIN" 
+                ? "dark:bg-slate-900 dark:text-slate-100 bg-white text-slate-900" 
+                : "bg-card text-foreground"
+            )}>
                <nav className="flex-1 px-4 py-6 space-y-2">
                 {navItems.map((item) => {
                   const isActive = pathname === item.href;
@@ -77,7 +97,7 @@ const DashboardMobileNav = ({ navItems, title = "Menu", role = "USER" }: Dashboa
                         isActive 
                           ? "bg-primary text-primary-foreground shadow-md scale-[1.02]" 
                           : role === "ADMIN" 
-                            ? "text-slate-400 hover:bg-slate-800 hover:text-white"
+                            ? "dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                             : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       )}
                     >
@@ -87,13 +107,20 @@ const DashboardMobileNav = ({ navItems, title = "Menu", role = "USER" }: Dashboa
                   );
                 })}
               </nav>
-              <div className={cn("p-6 border-t mb-8", role === "ADMIN" ? "border-slate-800" : "border-border")}>
+              <div className={cn(
+                "p-6 border-t mb-8", 
+                role === "ADMIN" 
+                  ? "dark:border-slate-800 border-slate-100" 
+                  : "border-border"
+              )}>
                 <Button
                   variant="ghost"
                   size="lg"
                   className={cn(
                     "w-full flex items-center justify-start gap-4 px-4 py-3 text-base font-semibold",
-                    role === "ADMIN" ? "text-red-400 hover:bg-red-950 hover:text-red-300" : "text-destructive hover:bg-destructive/10"
+                    role === "ADMIN" 
+                      ? "text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300 hover:bg-red-50 hover:text-red-600" 
+                      : "text-destructive hover:bg-destructive/10"
                   )}
                   onClick={handleLogout}
                 >
