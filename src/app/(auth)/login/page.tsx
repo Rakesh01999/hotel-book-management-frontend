@@ -67,7 +67,7 @@ export default function LoginPage() {
 
   const handleGoogleLogin = () => {
     // Redirect to backend Google Auth endpoint
-    const backendUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
     window.location.href = `${backendUrl}/auth/google`;
   };
 
