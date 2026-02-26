@@ -28,16 +28,26 @@ import { ActionConfirmModal } from "@/components/modals/ActionConfirmModal";
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchName, setSearchName] = useState("");
+  const [searchEmail, setSearchEmail] = useState("");
+  const [searchDate, setSearchDate] = useState("");
+  const [searchTerm, setSearchTerm] = useState(""); // Kept for general or ID search if needed
   const [isCancelling, setIsCancelling] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState<number | null>(null);
 
-  const fetchBookings = async (search?: string) => {
+  const fetchBookings = async () => {
     setIsLoading(true);
     try {
-      const url = search ? `/book?searchTerm=${search}` : '/book?page=1&limit=100';
-      const response = await api.get(url);
+      const params = new URLSearchParams();
+      params.append('page', '1');
+      params.append('limit', '100');
+      if (searchName) params.append('name', searchName);
+      if (searchEmail) params.append('email', searchEmail);
+      if (searchDate) params.append('date', searchDate);
+      if (searchTerm) params.append('searchTerm', searchTerm);
+
+      const response = await api.get(`/book?${params.toString()}`);
       setBookings(response.data?.data?.data || []);
     } catch (error: unknown) {
       console.error("Failed to fetch bookings:", error);
@@ -54,12 +64,20 @@ export default function AdminBookingsPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchBookings(searchTerm);
+    fetchBookings();
   };
 
   const clearSearch = () => {
+    setSearchName("");
+    setSearchEmail("");
+    setSearchDate("");
     setSearchTerm("");
-    fetchBookings();
+    // We need to wait for state updates or pass empty values directly
+    setIsLoading(true);
+    api.get('/book?page=1&limit=100').then((response) => {
+      setBookings(response.data?.data?.data || []);
+      setIsLoading(false);
+    });
   };
 
   const handleCancelBooking = (id: number) => {
@@ -74,7 +92,7 @@ export default function AdminBookingsPage() {
     try {
       await api.patch(`/book/cancel/${selectedBookingId}`);
       toast.success("Booking cancelled successfully");
-      fetchBookings(searchTerm); // Refresh the list
+      fetchBookings(); // Refresh the list
       setIsModalOpen(false);
     } catch (error: unknown) {
       console.error("Failed to cancel booking:", error);
@@ -110,27 +128,49 @@ export default function AdminBookingsPage() {
       <Card className="border-none shadow-md">
         <CardHeader className="bg-muted/30 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4">
           <CardTitle className="text-lg">All Reservations</CardTitle>
-          <form onSubmit={handleSearch} className="flex w-full sm:max-w-sm items-center space-x-2">
-            <div className="relative w-full">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Search by User ID..."
-                className="pl-8 bg-background"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              {searchTerm && (
-                <button 
+          <form onSubmit={handleSearch} className="flex flex-col gap-4 w-full">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Guest Name..."
+                  className="pl-8 bg-background"
+                  value={searchName}
+                  onChange={(e) => setSearchName(e.target.value)}
+                />
+              </div>
+              <div className="relative">
+                <Input
+                  type="text"
+                  placeholder="Guest Email..."
+                  className="bg-background"
+                  value={searchEmail}
+                  onChange={(e) => setSearchEmail(e.target.value)}
+                />
+              </div>
+              <div className="relative">
+                <Input
+                  type="date"
+                  className="bg-background"
+                  value={searchDate}
+                  onChange={(e) => setSearchDate(e.target.value)}
+                  title="Search by Booking Date"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button type="submit" size="sm" className="flex-1">Search</Button>
+                <Button 
                   type="button" 
+                  variant="outline" 
+                  size="sm" 
                   onClick={clearSearch}
-                  className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
+                  className="px-2"
                 >
                   <XCircle className="h-4 w-4" />
-                </button>
-              )}
+                </Button>
+              </div>
             </div>
-            <Button type="submit" size="sm" variant="secondary">Filter</Button>
           </form>
         </CardHeader>
         <CardContent className="p-0">
