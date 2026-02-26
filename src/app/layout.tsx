@@ -42,7 +42,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <QueryProvider>
-            <Toaster position="top-right" richColors />
+            <Toaster position="top-right" richColors closeButton />
             <AuthProvider>
               <Navbar />
               <main className="flex-1">
