@@ -31,6 +31,8 @@ export default function AdminBookingsPage() {
   const [searchName, setSearchName] = useState("");
   const [searchEmail, setSearchEmail] = useState("");
   const [searchDate, setSearchDate] = useState("");
+  const [searchCheckIn, setSearchCheckIn] = useState("");
+  const [searchCheckOut, setSearchCheckOut] = useState("");
   const [searchTerm, setSearchTerm] = useState(""); // Kept for general or ID search if needed
   const [isCancelling, setIsCancelling] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,6 +47,8 @@ export default function AdminBookingsPage() {
       if (searchName) params.append('name', searchName);
       if (searchEmail) params.append('email', searchEmail);
       if (searchDate) params.append('date', searchDate);
+      if (searchCheckIn) params.append('checkIn', searchCheckIn);
+      if (searchCheckOut) params.append('checkOut', searchCheckOut);
       if (searchTerm) params.append('searchTerm', searchTerm);
 
       const response = await api.get(`/book?${params.toString()}`);
@@ -71,6 +75,8 @@ export default function AdminBookingsPage() {
     setSearchName("");
     setSearchEmail("");
     setSearchDate("");
+    setSearchCheckIn("");
+    setSearchCheckOut("");
     setSearchTerm("");
     // We need to wait for state updates or pass empty values directly
     setIsLoading(true);
@@ -129,13 +135,13 @@ export default function AdminBookingsPage() {
         <CardHeader className="bg-muted/30 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4">
           <CardTitle className="text-lg">All Reservations</CardTitle>
           <form onSubmit={handleSearch} className="flex flex-col gap-4 w-full">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
                   type="text"
                   placeholder="Guest Name..."
-                  className="pl-8 bg-background"
+                  className="pl-8 bg-background h-9 text-sm"
                   value={searchName}
                   onChange={(e) => setSearchName(e.target.value)}
                 />
@@ -144,28 +150,49 @@ export default function AdminBookingsPage() {
                 <Input
                   type="text"
                   placeholder="Guest Email..."
-                  className="bg-background"
+                  className="bg-background h-9 text-sm"
                   value={searchEmail}
                   onChange={(e) => setSearchEmail(e.target.value)}
                 />
               </div>
-              <div className="relative">
+              <div className="flex flex-col">
                 <Input
                   type="date"
-                  className="bg-background"
+                  className="bg-background h-9 text-xs"
                   value={searchDate}
                   onChange={(e) => setSearchDate(e.target.value)}
-                  title="Search by Booking Date"
+                  title="Any date overlapping"
                 />
+                <span className="text-[10px] text-muted-foreground mt-0.5 px-1">Overlapping Date</span>
+              </div>
+              <div className="flex flex-col">
+                <Input
+                  type="date"
+                  className="bg-background h-9 text-xs"
+                  value={searchCheckIn}
+                  onChange={(e) => setSearchCheckIn(e.target.value)}
+                  title="Check-In from"
+                />
+                <span className="text-[10px] text-muted-foreground mt-0.5 px-1">Check-In From</span>
+              </div>
+              <div className="flex flex-col">
+                <Input
+                  type="date"
+                  className="bg-background h-9 text-xs"
+                  value={searchCheckOut}
+                  onChange={(e) => setSearchCheckOut(e.target.value)}
+                  title="Check-Out until"
+                />
+                <span className="text-[10px] text-muted-foreground mt-0.5 px-1">Check-Out Until</span>
               </div>
               <div className="flex gap-2">
-                <Button type="submit" size="sm" className="flex-1">Search</Button>
+                <Button type="submit" size="sm" className="flex-1 h-9">Search</Button>
                 <Button 
                   type="button" 
                   variant="outline" 
                   size="sm" 
                   onClick={clearSearch}
-                  className="px-2"
+                  className="px-2 h-9"
                 >
                   <XCircle className="h-4 w-4" />
                 </Button>
