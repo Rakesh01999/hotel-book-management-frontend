@@ -12,6 +12,10 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Hotel Book Management | Premium Experience",
   description: "Book your luxury stay with ease.",
+  icons: {
+    icon: "/tab_hotel_logo.png?v=1",
+    shortcut: "/tab_hotel_logo.png?v=1",
+  },
 };
 
 import Navbar from "@/components/layout/Navbar";
