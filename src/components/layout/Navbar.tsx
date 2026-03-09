@@ -102,13 +102,13 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 shadow-sm">
       <div className="container flex h-20 items-center justify-between">
         <Link href="/" className="flex items-center group">
-          <div className="relative p-1 rounded-lg bg-slate-900 shadow-lg ring-1 ring-amber-400/20 transition-all duration-300 group-hover:bg-black overflow-hidden transform group-hover:scale-105">
+          <div className="relative transition-all duration-300 transform group-hover:scale-105">
             <Image 
               src="/hotel_logo.png" 
               alt="LuxeStay Logo" 
-              width={180} 
-              height={50} 
-              className="h-12 w-auto object-contain brightness-110"
+              width={240} 
+              height={64} 
+              className="h-16 w-auto object-contain"
               priority
             />
           </div>
