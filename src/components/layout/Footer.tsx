@@ -7,14 +7,16 @@ export default function Footer() {
       <div className="container py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="space-y-6">
-            <Link href="/" className="inline-block transition-transform hover:scale-105">
-              <Image 
-                src="/hotel_logo.png" 
-                alt="LuxeStay Logo" 
-                width={160} 
-                height={45} 
-                className="h-10 w-auto brightness-110"
-              />
+            <Link href="/" className="flex items-center group">
+              <div className="relative transition-all duration-300 transform group-hover:scale-105">
+                <Image
+                  src="/hotel_logo.png"
+                  alt="LuxeStay Logo"
+                  width={240}
+                  height={64}
+                  className="h-16 w-auto object-contain"
+                />
+              </div>
             </Link>
             <p className="text-sm text-slate-400 leading-relaxed">
               Experience luxury and comfort in the heart of the city. We provide a seamless booking experience for the world's most premium stays.
