@@ -376,10 +376,24 @@ function RoomDetails() {
 
               <Button 
                 onClick={handleOpenBookingModal}
-                className="w-full h-12 text-lg font-semibold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform active:scale-95 group"
+                className={`w-full h-12 text-lg font-semibold shadow-lg transition-transform active:scale-95 group ${
+                  isAuthenticated 
+                    ? "shadow-primary/20 hover:scale-[1.02]" 
+                    : "bg-muted-foreground/10 text-muted-foreground hover:bg-muted-foreground/20 hover:scale-100 shadow-none border border-muted-foreground/20"
+                }`}
+                variant={isAuthenticated ? "default" : "outline"}
               >
-                Book This Room
-                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                {isAuthenticated ? (
+                  <>
+                    Book This Room
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </>
+                ) : (
+                  <>
+                    <Key className="mr-2 h-5 w-5 opacity-70" />
+                    Login to Book
+                  </>
+                )}
               </Button>
               
               <p className="text-center text-xs text-muted-foreground italic flex items-center justify-center gap-1">

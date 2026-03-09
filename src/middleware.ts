@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname;
 
     // Define public paths that don't require authentication
-    const isPublicPath = path === '/login' || path === '/register' || path === '/';
+    const isPublicPath = path === '/login' || path === '/register' || path === '/' || path.startsWith('/rooms');
 
     // Get the token from the cookies
     // Note: Backend sets 'accessToken' cookie
@@ -33,7 +33,8 @@ export const config = {
         '/login',
         '/register',
         '/user/:path*', // Protect user dashboard
-        // '/rooms/:path*',    // Protect room booking if needed
-        '/rooms',    
+        '/admin/:path*', // Protect admin dashboard
+        '/rooms/:path*',    // We keep it in matcher so middleware runs for it
+        '/rooms',
     ],
 };
