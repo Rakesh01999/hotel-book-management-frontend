@@ -40,7 +40,8 @@ export default function NotFound() {
             </Link>
           </Button>
           
-          <Button asChild variant="outline" size="lg" className="h-12 px-8 text-lg border-white/20 text-white hover:bg-white/10 backdrop-blur-sm">
+          {/* <Button asChild size="lg" className="h-12 px-8 text-lg border-white/20 text-white hover:bg-white/10 backdrop-blur-sm"> */}
+          <Button asChild size="lg" className="h-12 px-8 text-lg shadow-xl shadow-primary/20 group">
             <Link href="/rooms">
               <Search className="mr-2 h-5 w-5" />
               Browse Rooms
@@ -50,7 +51,7 @@ export default function NotFound() {
 
         <div className="pt-12 flex items-center justify-center gap-2 text-slate-400 text-sm">
           <Map className="h-4 w-4" />
-          <span>Need directions? <Link href="/contact" className="text-primary hover:underline">Contact Concierge</Link></span>
+          <span>Need directions? <Link href="/contact" className="text-primary text-white hover:underline">Contact Concierge</Link></span>
         </div>
       </div>
 
